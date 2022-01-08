@@ -1,0 +1,101 @@
+:root
+{
+	--square-size: 4em;
+	--board-border-size: .5;
+	--board-size: calc(var(--square-size) * 8);
+}
+
+body
+{
+	margin: 0;
+	background-color: #777;
+	height: 100vh;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.chess-board-container
+{
+	display: inline-block; /* fixes width of .board */
+	border: calc(var(--square-size) * var(--board-border-size)) solid rgb(91, 62, 30);
+}
+
+.board
+{
+	user-select: none;
+}
+
+.empty.board
+{
+	width: calc(var(--square-size) * 8);
+	height: calc(var(--square-size) * 8);
+	border-color: transparent;
+}
+
+.board-row
+{
+	display: flex;
+}
+
+.board-cell
+{
+	position: relative;
+
+	width: var(--square-size);
+	height: var(--square-size);
+
+	text-align: center;
+}
+
+.board .piece
+{
+	width: 100%;
+	height: 100%;
+}
+
+.board .piece.selectable
+{
+	cursor: pointer;
+}
+
+.board .piece img
+{
+	position: absolute;
+	left: 0;
+	top: 0;
+
+	width: 100%;
+	height: 100%;
+
+	pointer-events: none;
+}
+
+.board .square img
+{
+	position: absolute;
+	z-index: -1;
+	left: 0;
+	top: 0;
+
+	width: 100%;
+	height: 100%;
+
+	pointer-events: none;
+}
+
+.board .legal-move::after
+{
+	content: '';
+	position: absolute;
+	z-index: 1;
+	left: 0;
+	top: 0;
+
+	width: 100%;
+	height: 100%;
+
+	background: rgba(0, 255, 0, 0.2);
+}

@@ -1,0 +1,22 @@
+{
+	"name": "chess-server",
+	"version": "0.0.1",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"start": "node index.js"
+	},
+	"keywords": [],
+	"authors": [
+		"Iannis de Zwart",
+		"Eugene Wu"
+	],
+	"license": "ISC",
+	"dependencies": {
+		"@types/express": "^4.17.13",
+		"@types/ws": "^8.2.2",
+		"express": "^4.17.2",
+		"ws": "^8.4.0"
+	},
+	"type": "module"
+}
