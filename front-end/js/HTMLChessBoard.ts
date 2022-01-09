@@ -13,6 +13,8 @@ class HTMLChessBoard
 	draggingPiece: HTMLElement
 	draggingPieceSquare: Square
 
+	unselectable = false
+
 	constructor(boardContainerEl: HTMLElement, player: Colour)
 	{
 		this.boardContainerEl = boardContainerEl
@@ -306,8 +308,9 @@ class HTMLChessBoard
 					continue
 				}
 
-				if (this.board.turn == this.player &&
-					piece.colour == this.board.turn)
+				if (!this.unselectable
+					&& this.board.turn == this.player
+					&& piece.colour == this.board.turn)
 				{
 					pieceEl.classList.add('selectable')
 				}
@@ -358,8 +361,9 @@ class HTMLChessBoard
 
 				if (piece != null)
 				{
-					if (this.board.turn == this.player &&
-						piece.colour == this.board.turn)
+					if (!this.unselectable
+						&& this.board.turn == this.player
+						&& piece.colour == this.board.turn)
 					{
 						cell.innerHTML += /* html */ `
 						<div class="selectable piece">

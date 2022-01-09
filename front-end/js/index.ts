@@ -8,7 +8,7 @@ interface GameReadyData
 
 receive('game-ready', (data: GameReadyData) =>
 {
-	location.href = `/game/${ data.gameID }`
+	location.href = `/play/${ data.gameID }`
 })
 
 /**

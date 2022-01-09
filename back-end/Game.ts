@@ -49,7 +49,7 @@ export class Game
 	 */
 	sendGameState(ws: WebSocket)
 	{
-		const player = ws == this.white.ws ? Colour.White : Colour.Black
+		const player = ws == this.black.ws ? Colour.Black : Colour.White
 
 		send(ws, {
 			type: 'game-state',

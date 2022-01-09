@@ -1,0 +1,9 @@
+Maybe:
+	- Add the possibility of drawing arrows.
+	- Add a clock.
+	- Add a score indicator.
+	- Add user account management.
+
+Todo:
+	- Make splash screen.
+	- Make a menu.

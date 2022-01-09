@@ -2,9 +2,9 @@ import { Request, Response } from 'express'
 import { games } from '../Game.js'
 
 /**
- * Route that displays a specific game.
+ * Route that displays a specific game as a spectator.
  */
-export const gameRoute = (req: Request, res: Response) =>
+export const spectateRoute = (req: Request, res: Response) =>
 {
 	// Get the game ID from the URL.
 
@@ -24,5 +24,5 @@ export const gameRoute = (req: Request, res: Response) =>
 
 	// Render the game page.
 
-	res.sendFile('match.html', { root: '../front-end' })
+	res.sendFile('spectate.html', { root: '../front-end' })
 }

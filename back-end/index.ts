@@ -6,6 +6,7 @@ import { getUserToken } from './ws-routes/get-user-token.js'
 import { joinGame } from './ws-routes/join-game.js'
 import { move } from './ws-routes/move.js'
 import { playGame } from './ws-routes/play-game.js'
+import { spectateGame } from './ws-routes/spectate-game.js'
 
 const PORT = +process.argv[2] || 3000
 
@@ -85,6 +86,12 @@ wsServer.on('connection', ws =>
 			case 'move':
 			{
 				move(data, ws)
+				break
+			}
+
+			case 'spectate-game':
+			{
+				spectateGame(data, ws)
 				break
 			}
 		}

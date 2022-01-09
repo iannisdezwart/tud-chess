@@ -1,8 +1,10 @@
 import express from 'express'
-import { gameRoute } from './game.js'
+import { playRoute } from './play.js'
+import { spectateRoute } from './spectate.js'
 
 export const router = express.Router()
 
 // Register routes to the router.
 
-router.get('/game/:gameID', gameRoute)
+router.get('/play/:gameID', playRoute)
+router.get('/spectate/:gameID', spectateRoute)

@@ -1,6 +1,6 @@
 import { WebSocket } from 'ws'
 import { games } from '../Game.js'
-import { send, sendError } from '../util.js'
+import { sendError } from '../util.js'
 
 interface PlayGameData
 {
