@@ -20,17 +20,38 @@ class HTMLChessBoard
 		this.player = player
 	}
 
+	/**
+	 * Sets the board from a string.
+	 */
+	setBoard(board: string)
+	{
+		this.board = ChessBoard.fromString(board)
+	}
+
+	/**
+	 * Wraps a MouseEvent to a Touch, so we can write the same code for
+	 * both mouse and touch events.
+	 */
 	wrapMouseEventToTouch(e: MouseEvent)
 	{
 		const { target, clientX, clientY } = e
 		return new Touch({ identifier: 0, target, clientX, clientY })
 	}
 
+	/**
+	 * Wraps a TouchEvent to a Touch, so we can write the same code for
+	 * both mouse and touch events.
+	 */
 	wrapTouchEventToTouch(e: TouchEvent)
 	{
 		return e.changedTouches[0]
 	}
 
+	/**
+	 * Returns the square the user is hovering over.
+	 * The square is formatted absolutely, so it's always relative to the
+	 * A1 square.
+	 */
 	pointedSquare(touch: Touch)
 	{
 		const { clientX, clientY } = touch
@@ -47,6 +68,11 @@ class HTMLChessBoard
 		return new Square(x, y)
 	}
 
+	/**
+	 * Translates the pointer position to the relative position of a
+	 * square HTML element on the board. Takes in account the board's
+	 * rotation.
+	 */
 	translatePointerPositionToSquare(x: number, y: number)
 	{
 		if (this.player == Colour.White)
@@ -59,6 +85,10 @@ class HTMLChessBoard
 		}
 	}
 
+	/**
+	 * Returns the HTML element that corresponds to a square on the
+	 * chess board.
+	 */
 	getSquare(square: Square)
 	{
 		const { x, y } = square
@@ -66,6 +96,9 @@ class HTMLChessBoard
 		return this.boardEl.children[sq[1]].children[sq[0]]
 	}
 
+	/**
+	 * Handles the start of a drag.
+	 */
 	touchDownHandler(touch: Touch, e: Event)
 	{
 		const target = touch.target as HTMLElement
@@ -91,6 +124,9 @@ class HTMLChessBoard
 		}
 	}
 
+	/**
+	 * Handles dragging.
+	 */
 	touchMoveHandler(touch: Touch, e: Event)
 	{
 		if (this.draggingPiece == null)
@@ -117,6 +153,9 @@ class HTMLChessBoard
 		img.style.zIndex = '1'
 	}
 
+	/**
+	 * Handles the end of a drag.
+	 */
 	touchUpHandler(touch: Touch, e: Event)
 	{
 		if (this.draggingPiece == null)
@@ -160,6 +199,10 @@ class HTMLChessBoard
 		this.render()
 	}
 
+	/**
+	 * Returns the piece at a square.
+	 * Does not take into account the board's rotation.
+	 */
 	pieceAt(x: number, y: number)
 	{
 		if (this.player == Colour.White)
@@ -170,6 +213,9 @@ class HTMLChessBoard
 		return this.board.pieceAt(7 - x, 7 - y)
 	}
 
+	/**
+	 * Renders the board.
+	 */
 	render()
 	{
 		this.boardEl = document.createElement('div')
@@ -206,7 +252,7 @@ class HTMLChessBoard
 
 				if (piece != null)
 				{
-					if (// this.board.turn == this.player &&
+					if (this.board.turn == this.player &&
 						piece.colour == this.board.turn)
 					{
 						cell.innerHTML += /* html */ `

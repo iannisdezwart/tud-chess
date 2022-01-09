@@ -1,45 +1,41 @@
 import express from 'express'
-import { WebSocket, WebSocketServer } from 'ws'
-import { Game } from './Game.js'
+import { WebSocketServer } from 'ws'
+import { router } from './express-routes/routes.js'
+import { send, sendError } from './util.js'
+import { getUserToken } from './ws-routes/get-user-token.js'
+import { joinGame } from './ws-routes/join-game.js'
+import { move } from './ws-routes/move.js'
+import { playGame } from './ws-routes/play-game.js'
 
 const PORT = +process.argv[2] || 3000
-const app = express()
+
+// Create the HTTP server.
+
+export const app = express()
 const server = app.listen(PORT, () => console.log(`Server listening on port ${ PORT }`))
+
+// Include the static files in the `front-end` directory.
 
 app.use(express.static('../front-end'))
 
+// Register routes to the express app.
+
+app.use(router)
+
+// Start the WebSocket server at the same port as the HTTP server.
+
 const wsServer = new WebSocketServer({ server })
 
-let waitingClient: WebSocket
-const games: Map<string, Game> = new Map()
-
-const randomID = () =>
-{
-	const chars = '0123456789abcdefghijklmnopqrstuvwxyz'
-	let id = ''
-
-	for (let i = 0; i < 8; i++)
-	{
-		id += chars[Math.floor(Math.random() * chars.length)]
-	}
-
-	return id
-}
-
-const send = (ws: WebSocket, data: any) =>
-{
-	ws.send(JSON.stringify(data))
-}
+// Handle new WebSocket connections.
 
 wsServer.on('connection', ws =>
 {
-	const respond = (data: any) =>
-	{
-		send(ws, data)
-	}
+	// Handle incoming messages on this new WebSocket.
 
 	ws.on('message', message =>
 	{
+		// Parse the message.
+
 		let data: any
 
 		try
@@ -48,64 +44,48 @@ wsServer.on('connection', ws =>
 		}
 		catch
 		{
-			respond({ error: 'Invalid input' })
+			// Ignore invalid JSON.
+
+			sendError(ws, 'Invalid JSON input.')
 			return
 		}
+
+		// Handle missing fields.
 
 		if (data.type == null)
 		{
-			respond({ error: 'Invalid input' })
+			sendError(ws, 'Missing "type" field.')
 			return
 		}
 
+		// Handle the message.
+
+		console.log(`<<< [WS]`, data)
+
 		switch (data.type)
 		{
+			case 'get-user-token':
+			{
+				getUserToken(ws)
+				break
+			}
+
 			case 'join-game':
 			{
-				if (waitingClient != null)
-				{
-					const gameID = randomID()
-					const game = new Game(waitingClient, ws)
+				joinGame(data, ws)
+				break
+			}
 
-					games.set(gameID, game)
-
-					send(waitingClient, {
-						type: 'game-ready',
-						colour: Colour.White,
-						gameID
-					})
-
-					respond({
-						type: 'game-ready',
-						colour: Colour.Black,
-						gameID
-					})
-
-					waitingClient = null
-					break
-				}
-
-				waitingClient = ws
+			case 'play-game':
+			{
+				playGame(data, ws)
 				break
 			}
 
 			case 'move':
 			{
-				if (data.gameID == null || data.from == null || data.to == null)
-				{
-					respond({ error: 'Invalid input' })
-					break
-				}
-
-				const game = games.get(data.gameID)
-
-				if (game == null)
-				{
-					respond({ error: 'Invalid game ID' })
-					break
-				}
-
-				// ...
+				move(data, ws)
+				break
 			}
 		}
 	})

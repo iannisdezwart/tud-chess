@@ -1,15 +1,20 @@
-let board: HTMLChessBoard
-
-addEventListener('DOMContentLoaded', () => {
-	const boardContainerEl = document.querySelector('.chess-board-container') as HTMLElement
-	board = new HTMLChessBoard(boardContainerEl, Colour.White)
-	board.render()
-})
-
-const curPointerPos = [ innerWidth / 2, innerHeight / 2 ]
-
-addEventListener('mousemove', e =>
+interface GameReadyData
 {
-	curPointerPos[0] = e.clientX
-	curPointerPos[1] = e.clientY
+	type: 'game-ready'
+	gameID: string
+}
+
+// If a game is ready, join it.
+
+receive('game-ready', (data: GameReadyData) =>
+{
+	location.href = `/game/${ data.gameID }`
 })
+
+/**
+ * Ask the server to join a game.
+ */
+const joinGame = async () =>
+{
+	send({ type: 'join-game', token: await userToken() })
+}

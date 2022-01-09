@@ -28,6 +28,78 @@ class ChessPiece
 		this.colour = colour
 	}
 
+	toString()
+	{
+		if (this.colour == Colour.White)
+		{
+			switch (this.type)
+			{
+				case ChessPieceType.King:
+				{
+					return 'K'
+				}
+
+				case ChessPieceType.Queen:
+				{
+					return 'Q'
+				}
+
+				case ChessPieceType.Rook:
+				{
+					return 'R'
+				}
+
+				case ChessPieceType.Bishop:
+				{
+					return 'B'
+				}
+
+				case ChessPieceType.Knight:
+				{
+					return 'N'
+				}
+
+				case ChessPieceType.Pawn:
+				{
+					return 'P'
+				}
+			}
+		}
+
+		switch (this.type)
+		{
+			case ChessPieceType.King:
+			{
+				return 'k'
+			}
+
+			case ChessPieceType.Queen:
+			{
+				return 'q'
+			}
+
+			case ChessPieceType.Rook:
+			{
+				return 'r'
+			}
+
+			case ChessPieceType.Bishop:
+			{
+				return 'b'
+			}
+
+			case ChessPieceType.Knight:
+			{
+				return 'n'
+			}
+
+			case ChessPieceType.Pawn:
+			{
+				return 'p'
+			}
+		}
+	}
+
 	is(colour: Colour, type: ChessPieceType)
 	{
 		return this.colour == colour && this.type == type

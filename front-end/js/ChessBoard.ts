@@ -55,6 +55,57 @@ class ChessBoard
 		this.turn = Colour.White
 	}
 
+	toString()
+	{
+		return JSON.stringify(this)
+	}
+
+	static fromString(str: string)
+	{
+		const board = new ChessBoard()
+		const data = JSON.parse(str)
+
+		for (let y = 0; y < 8; y++)
+		{
+			const row = []
+
+			for (let x = 0; x < 8; x++)
+			{
+				if (data.board[y][x] == null)
+				{
+					row.push(null)
+					continue
+				}
+
+				const type = data.board[y][x].type
+				const colour = data.board[y][x].colour
+				const piece = new ChessPiece(type, colour)
+
+				row.push(piece)
+			}
+
+			board.board.push(row)
+		}
+
+		board.whiteKingMoved = data.whiteKingMoved
+		board.whiteLeftRookMoved = data.whiteLeftRookMoved
+		board.whiteRightRookMoved = data.whiteRightRookMoved
+
+		board.blackKingMoved = data.blackKingMoved
+		board.blackLeftRookMoved = data.blackLeftRookMoved
+		board.blackRightRookMoved = data.blackRightRookMoved
+
+		board.whiteEnPassant = data.whiteEnPassant
+		board.blackEnPassant = data.blackEnPassant
+
+		board.whiteKing = data.whiteKing
+		board.blackKing = data.blackKing
+
+		board.turn = data.turn
+
+		return board
+	}
+
 	pieceAt(x: number, y: number)
 	{
 		return this.board[y][x]
