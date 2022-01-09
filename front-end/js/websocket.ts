@@ -43,3 +43,10 @@ const receive = (type: string, callback: (data: any) => void) =>
 		callback(data)
 	})
 }
+
+// Dump WebSocket error messages to the console.
+
+receive('error', data =>
+{
+	console.error(data.error)
+})

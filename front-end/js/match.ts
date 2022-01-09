@@ -11,6 +11,7 @@ interface MoveData
 	type: 'move'
 	from: Square
 	to: Square
+	turnNumber: number
 }
 
 // The game ID is the last part of the URL.
@@ -23,7 +24,7 @@ addEventListener('DOMContentLoaded', async () =>
 {
 	const boardContainerEl = document.querySelector('.chess-board-container') as HTMLElement
 
-	// Subscribe to the game.
+	// Join the game as a player.
 
 	send({ type: 'play-game', gameID, token: await userToken() })
 
@@ -40,18 +41,9 @@ addEventListener('DOMContentLoaded', async () =>
 
 	receive('move', (data: MoveData) =>
 	{
-		board.board.move(data.from, data.to)
-		board.render()
+		if (board.board.turnNumber != data.turnNumber)
+		{
+			board.move(data.from, data.to)
+		}
 	})
-})
-
-// Update the pointer position.
-// This is used to determine what square the user is hovering over.
-
-const curPointerPos = [ innerWidth / 2, innerHeight / 2 ]
-
-addEventListener('mousemove', e =>
-{
-	curPointerPos[0] = e.clientX
-	curPointerPos[1] = e.clientY
 })

@@ -74,6 +74,10 @@ export const playGame = (data: PlayGameData, ws: WebSocket) =>
 		game.black.ws = ws
 	}
 
+	// Subscribe the player to receive updates from the game.
+
+	game.subscribers.add(ws)
+
 	// Send the current game state to the player.
 
 	game.sendGameState(ws)

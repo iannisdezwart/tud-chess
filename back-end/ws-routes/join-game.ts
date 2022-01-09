@@ -27,6 +27,14 @@ export const joinGame = (data: JoinGameData, ws: WebSocket) =>
 
 	if (waitingPlayer != null)
 	{
+		// Make sure we don't start a game with the same player.
+
+		if (ws == waitingPlayer.ws)
+		{
+			sendError(ws, 'You are already waiting for a game.')
+			return
+		}
+
 		// There is a waiting player.
 		// Create a new game and add the two players.
 

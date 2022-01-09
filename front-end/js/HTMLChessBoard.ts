@@ -101,6 +101,8 @@ class HTMLChessBoard
 	 */
 	touchDownHandler(touch: Touch, e: Event)
 	{
+		// Check if the user is hovering over a piece.
+
 		const target = touch.target as HTMLElement
 
 		if (!target.classList.contains('piece')
@@ -109,10 +111,16 @@ class HTMLChessBoard
 			return
 		}
 
+		// Prevent mobile scrolling.
+
 		e.preventDefault()
+
+		// Get the dragged piece and its square.
 
 		this.draggingPiece = target
 		this.draggingPieceSquare = this.pointedSquare(touch)
+
+		// Show the legal moves.
 
 		const { x: xFrom, y: yFrom } = this.draggingPieceSquare
 		const legalMoves = this.board.possibleMoves(xFrom, yFrom, true)
@@ -134,7 +142,11 @@ class HTMLChessBoard
 			return
 		}
 
+		// Prevent mobile scrolling.
+
 		e.preventDefault()
+
+		// Update the position of the dragged piece.
 
 		const { clientX, clientY } = touch
 		const img = this.draggingPiece.querySelector<HTMLImageElement>('img')
@@ -146,9 +158,6 @@ class HTMLChessBoard
 		const x = (clientX - middleX) / rect.width * 100
 		const y = (clientY - middleY) / rect.height * 100
 
-		curPointerPos[0] = clientX - document.documentElement.scrollLeft
-		curPointerPos[1] = clientY - document.documentElement.scrollTop
-
 		img.style.transform = `translate(${ x }%, ${ y }%)`
 		img.style.zIndex = '1'
 	}
@@ -156,17 +165,19 @@ class HTMLChessBoard
 	/**
 	 * Handles the end of a drag.
 	 */
-	touchUpHandler(touch: Touch, e: Event)
+	async touchUpHandler(touch: Touch, e: Event)
 	{
 		if (this.draggingPiece == null)
 		{
 			return
 		}
 
+		// Prevent mobile scrolling.
+
 		e.preventDefault()
 
-		curPointerPos[0] = innerWidth / 2
-		curPointerPos[1] = innerHeight / 2
+		// Get the square where the piece came from and where
+		// it was dropped.
 
 		const fromSquare = this.draggingPieceSquare
 		const toSquare = this.pointedSquare(touch)
@@ -179,24 +190,42 @@ class HTMLChessBoard
 			moveIsLegal = toSquareEl.classList.contains('legal-move')
 		}
 
+		// Undo the visual translations on the piece.
+
 		const img = this.draggingPiece.querySelector<HTMLImageElement>('img')
 
 		img.style.transform = null
 		img.style.zIndex = null
 		this.draggingPiece = null
 
+		// Remove the legal move highlights.
+
 		for (const square of [].slice.call(document.querySelectorAll('.legal-move')))
 		{
 			square.classList.remove('legal-move')
 		}
+
+		// If the move is not legal, return the piece to its original
+		// position.
 
 		if (fromSquare.equals(toSquare) || !moveIsLegal)
 		{
 			return
 		}
 
-		this.board.move(fromSquare, toSquare)
-		this.render()
+		// Send the move to the server.
+
+		send({
+			type: 'move',
+			gameID,
+			token: await userToken(),
+			from: fromSquare,
+			to: toSquare,
+		})
+
+		// Perform the move locally.
+
+		this.move(fromSquare, toSquare)
 	}
 
 	/**
@@ -211,6 +240,83 @@ class HTMLChessBoard
 		}
 
 		return this.board.pieceAt(7 - x, 7 - y)
+	}
+
+	/**
+	 * Performs a move on the board.
+	 */
+	move(from: Square, to: Square)
+	{
+		// Perform the move.
+
+		const changedSquares = this.board.move(from, to)
+
+		// Update the board.
+
+		for (const changedSquare of changedSquares)
+		{
+			let { x, y } = changedSquare
+
+			// Update the square if the board is rotated.
+
+			if (this.player == Colour.Black)
+			{
+				x = 7 - x
+				y = 7 - y
+			}
+
+			const piece = this.pieceAt(x, y)
+			const squareEl = this.getSquare(changedSquare)
+			const pieceEl = squareEl.querySelector('.piece')
+
+			// Empty the square.
+
+			if (pieceEl != null)
+			{
+				pieceEl.remove()
+			}
+
+			if (piece == null)
+			{
+				continue
+			}
+
+			// Update the piece on the square.
+
+			squareEl.insertAdjacentHTML('beforeend', /* html */ `
+			<div class="piece">
+				${ this.pieceAt(x, y).svg() }
+			</div>
+			`)
+		}
+
+		// Update the selectable pieces.
+
+		for (let y = 0; y < 8; y++)
+		{
+			for (let x = 0; x < 8; x++)
+			{
+				const piece = this.board.pieceAt(x, y)
+				const square = new Square(x, y)
+				const squareEl = this.getSquare(square)
+				const pieceEl = squareEl.querySelector('.piece')
+
+				if (pieceEl == null)
+				{
+					continue
+				}
+
+				if (this.board.turn == this.player &&
+					piece.colour == this.board.turn)
+				{
+					pieceEl.classList.add('selectable')
+				}
+				else
+				{
+					pieceEl.classList.remove('selectable')
+				}
+			}
+		}
 	}
 
 	/**
@@ -234,7 +340,7 @@ class HTMLChessBoard
 				if (this.board.squareColour(x, y) == Colour.Black)
 				{
 					cell.innerHTML += /* html */ `
-					<div class='square'>
+					<div class="square">
 						<img src='/res/svg/board/dark-square.svg'>
 					</div>
 					`
@@ -242,7 +348,7 @@ class HTMLChessBoard
 				else
 				{
 					cell.innerHTML += /* html */ `
-					<div class='square'>
+					<div class="square">
 						<img src='/res/svg/board/light-square.svg'>
 					</div>
 					`
@@ -256,7 +362,7 @@ class HTMLChessBoard
 						piece.colour == this.board.turn)
 					{
 						cell.innerHTML += /* html */ `
-						<div class='selectable piece'>
+						<div class="selectable piece">
 							${ this.pieceAt(x, y).svg() }
 						</div>
 						`
@@ -264,7 +370,7 @@ class HTMLChessBoard
 					else
 					{
 						cell.innerHTML += /* html */ `
-						<div class='piece'>
+						<div class="piece">
 							${ this.pieceAt(x, y).svg() }
 						</div>
 						`

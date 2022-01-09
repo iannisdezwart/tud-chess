@@ -33,6 +33,7 @@ class ChessBoard
 	blackKing: Square
 
 	turn: Colour
+	turnNumber: number
 
 	constructor()
 	{
@@ -53,6 +54,7 @@ class ChessBoard
 		this.blackKing = null
 
 		this.turn = Colour.White
+		this.turnNumber = 0
 	}
 
 	toString()
@@ -63,7 +65,7 @@ class ChessBoard
 	static fromString(str: string)
 	{
 		const board = new ChessBoard()
-		const data = JSON.parse(str)
+		const data = JSON.parse(str) as ChessBoard
 
 		for (let y = 0; y < 8; y++)
 		{
@@ -102,6 +104,7 @@ class ChessBoard
 		board.blackKing = data.blackKing
 
 		board.turn = data.turn
+		board.turnNumber = data.turnNumber
 
 		return board
 	}
@@ -1753,14 +1756,20 @@ class ChessBoard
 		return !check
 	}
 
+	/**
+	 * Performs a move on the board.
+	 * Returns the squares that were changed.
+	 */
 	move(fromSquare: Square, toSquare: Square)
 	{
 		const { x: xFrom, y: yFrom } = fromSquare
 		const { x: xTo, y: yTo } = toSquare
 
+		const changedSquares: Square[] = []
+
 		if (!this.isLegal(xFrom, yFrom, xTo, yTo))
 		{
-			return
+			return changedSquares
 		}
 
 		const movedPiece = this.board[yFrom][xFrom]
@@ -1768,30 +1777,45 @@ class ChessBoard
 		this.board[yTo][xTo] = movedPiece
 		this.board[yFrom][xFrom] = null
 
+		changedSquares.push(new Square(xFrom, yFrom))
+		changedSquares.push(new Square(xTo, yTo))
+
 		// Castling
 
 		if (movedPiece.is(Colour.White, ChessPieceType.King) && xTo - xFrom == 2)
 		{
 			this.board[yTo][3] = new ChessPiece(ChessPieceType.Rook, Colour.White)
 			this.board[yTo][0] = null
+
+			changedSquares.push(new Square(3, yTo))
+			changedSquares.push(new Square(0, yTo))
 		}
 
 		if (movedPiece.is(Colour.White, ChessPieceType.King) && xFrom - xTo == 2)
 		{
 			this.board[yTo][5] = new ChessPiece(ChessPieceType.Rook, Colour.White)
 			this.board[yTo][7] = null
+
+			changedSquares.push(new Square(5, yTo))
+			changedSquares.push(new Square(7, yTo))
 		}
 
 		if (movedPiece.is(Colour.Black, ChessPieceType.King) && xTo - xFrom == 2)
 		{
 			this.board[yTo][3] = new ChessPiece(ChessPieceType.Rook, Colour.Black)
 			this.board[yTo][0] = null
+
+			changedSquares.push(new Square(3, yTo))
+			changedSquares.push(new Square(0, yTo))
 		}
 
 		if (movedPiece.is(Colour.Black, ChessPieceType.King) && xFrom - xTo == 2)
 		{
 			this.board[yTo][5] = new ChessPiece(ChessPieceType.Rook, Colour.Black)
 			this.board[yTo][7] = null
+
+			changedSquares.push(new Square(5, yTo))
+			changedSquares.push(new Square(7, yTo))
 		}
 
 		// Keep track of castling legality
@@ -1848,13 +1872,13 @@ class ChessBoard
 		if (movedPiece.is(Colour.White, ChessPieceType.Pawn)
 			&& yTo - yFrom == 2)
 		{
-			this.whiteEnPassant[xFrom] = true;
+			this.whiteEnPassant[xFrom] = true
 		}
 
 		if (movedPiece.is(Colour.Black, ChessPieceType.Pawn)
 			&& yFrom - yTo == 2)
 		{
-			this.blackEnPassant[xFrom] = true;
+			this.blackEnPassant[xFrom] = true
 		}
 
 		if (movedPiece.is(Colour.White, ChessPieceType.Pawn)
@@ -1862,6 +1886,8 @@ class ChessBoard
 			&& xTo != xFrom)
 		{
 			this.board[yFrom][xTo] = null
+
+			changedSquares.push(new Square(xTo, yFrom))
 		}
 
 		if (movedPiece.is(Colour.Black, ChessPieceType.Pawn)
@@ -1869,6 +1895,8 @@ class ChessBoard
 			&& xTo != xFrom)
 		{
 			this.board[yFrom][xTo] = null
+
+			changedSquares.push(new Square(xTo, yFrom))
 		}
 
 		// Pawn promotion
@@ -1953,6 +1981,10 @@ class ChessBoard
 
 		this.turn = this.turn == Colour.White
 			? Colour.Black : Colour.White
+
+		this.turnNumber++
+
+		return changedSquares
 	}
 
 	static empty()

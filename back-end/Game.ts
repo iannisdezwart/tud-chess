@@ -15,9 +15,15 @@ export interface Player
  */
 export class Game
 {
+	// The two players.
 	white: Player
 	black: Player
 
+	// List of WebSockets that are subscribed to this game.
+	// All moves are broadcast to all subscribers.
+	subscribers: Set<WebSocket>
+
+	// The chess board.
 	board: ChessBoard
 
 	constructor(player1: Player, player2: Player)
@@ -33,12 +39,17 @@ export class Game
 			this.black = player1
 		}
 
+		this.subscribers = new Set()
+
 		this.board = ChessBoard.generateDefault()
 	}
 
+	/**
+	 * Sends the current game state to a given WebSocket.
+	 */
 	sendGameState(ws: WebSocket)
 	{
-		const player = this.white.ws ? Colour.White : Colour.Black
+		const player = ws == this.white.ws ? Colour.White : Colour.Black
 
 		send(ws, {
 			type: 'game-state',
@@ -46,6 +57,26 @@ export class Game
 			turn: this.board.turn,
 			player
 		})
+	}
+
+	/**
+	 * Sends a move to all subscribers.
+	 */
+	sendMove(from: Square, to: Square)
+	{
+		for (const ws of this.subscribers)
+		{
+			if (ws.readyState != WebSocket.OPEN)
+			{
+				continue
+			}
+
+			send(ws, {
+				type: 'move',
+				from, to,
+				turnNumber: this.board.turnNumber
+			 })
+		}
 	}
 }
 
