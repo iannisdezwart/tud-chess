@@ -26,6 +26,13 @@ interface MoveData
 	}
 }
 
+interface EndData
+{
+	type: 'end'
+	winner: Colour
+	reason: string
+}
+
 // The game ID is the last part of the URL.
 
 const gameID = location.href.split('/').pop()
@@ -75,5 +82,10 @@ addEventListener('DOMContentLoaded', async () =>
 		board.latestMoveTime = Date.now()
 
 		board.update()
+	})
+
+	receive('end', (data: EndData) =>
+	{
+		board.endGame(data.winner, data.reason)
 	})
 })

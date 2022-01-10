@@ -450,6 +450,8 @@ class HTMLChessBoard
 				<div class="username"></div>
 				<div class="eaten-pieces"></div>
 			</div>
+
+			<div class="end-game"></div>
 		</div>
 		`)
 
@@ -643,5 +645,46 @@ class HTMLChessBoard
 	{
 		this.updateClocks()
 		this.updateScore()
+	}
+
+	/**
+	 * Handles the end of a game.
+	 */
+	endGame(winner: Colour, reason: string)
+	{
+		// Stop the clock update handler.
+
+		this.board.turnNumber++
+
+		// Show the reason for the end of the game.
+
+		const endGameEl = this.boardContainerEl.querySelector('.end-game')
+		endGameEl.innerHTML = reason
+
+		// Flip the opponent's king upside down.
+
+		if (winner == null)
+		{
+			return
+		}
+
+		const opponent = winner == Colour.White
+			? Colour.Black : Colour.White
+
+		for (let y = 0; y < 8; y++)
+		{
+			for (let x = 0; x < 8; x++)
+			{
+				const piece = this.board.pieceAt(x, y)
+
+				if (piece != null
+					&& piece.type == ChessPieceType.King
+					&& piece.colour == opponent)
+				{
+					const opponentKing = this.getSquare(new Square(x, y))
+					opponentKing.querySelector('.piece').classList.add('flipped')
+				}
+			}
+		}
 	}
 }

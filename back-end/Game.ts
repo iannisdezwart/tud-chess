@@ -1,5 +1,6 @@
 import { WebSocket } from 'ws'
 import { send } from './util.js'
+import { createHash } from 'crypto'
 // @ts-ignore
 import _ChessBoard from '../front-end/js/ChessBoard.js'
 const ChessBoard = _ChessBoard as ChessBoardClass
@@ -34,6 +35,14 @@ export class Game
 	// The time of the last move.
 	lastMoveTime: number
 
+	// A map of hashes of all board positions that have occurred.
+	// The number of times this position has occurred is stored.
+	// This is used to check threefold repetition.
+	history: Map<string, number>
+
+	// Counter for the 50 move rule.
+	fiftyMoveRule: number
+
 	constructor(id: string, player1: Player, player2: Player)
 	{
 		this.id = id
@@ -51,6 +60,87 @@ export class Game
 
 		this.subscribers = new Set()
 		this.board = ChessBoard.generateDefault()
+		this.history = new Map()
+		this.fiftyMoveRule = 0
+
+		this.addHistory()
+		this.handleTimeoutLoss()
+	}
+
+	/**
+	 * Adds the current board position to the history.
+	 */
+	addHistory()
+	{
+		const board = this.board.boardStateString()
+		const hash = createHash('sha256').update(board).digest('hex')
+
+		if (this.history.has(hash))
+		{
+			const count = this.history.get(hash) + 1
+
+			this.history.set(hash, count)
+
+			return count
+		}
+
+		this.history.set(hash, 1)
+
+		return 1
+	}
+
+	/**
+	 * Handles ending the game if one player's clock runs out.
+	 */
+	handleTimeoutLoss()
+	{
+		const clocks = this.calculateClocks()
+
+		// Check if one's clock has run out.
+
+		if (clocks.white < 0)
+		{
+			this.endGame(Colour.Black, 'White ran out of time.')
+			return
+		}
+
+		if (clocks.black < 0)
+		{
+			this.endGame(Colour.White, 'Black ran out of time.')
+			return
+		}
+
+		// Get the lowest clock.
+
+		const lowestClock = Math.min(clocks.white, clocks.black)
+
+		// Set a timeout event to check again after the time on the
+		// lowest clock. This is the earliest possible time to check
+		// for a timeout loss.
+
+		setTimeout(() => this.handleTimeoutLoss(), lowestClock)
+	}
+
+	/**
+	 * Ends the game and broadcasts the winner to all subscribers.
+	 * @param winner The colour of the winner. If null, the game is a draw.
+	 */
+	endGame(winner: Colour, reason: string)
+	{
+		// Broadcast the winner to all subscribers.
+
+		for (const ws of this.subscribers)
+		{
+			send(ws, {
+				type: 'end',
+				winner,
+				reason
+			})
+		}
+
+		// Remove the game from the list of games.
+
+		this.destroy()
 	}
 
 	/**
@@ -107,8 +197,31 @@ export class Game
 	 */
 	sendMove(from: Square, to: Square)
 	{
+		// Perform the move.
+
+		const numPiecesBefore = this.board.countPieces()
+		const changedSquares = this.board.move(from, to)
+		const numPiecesAfter = this.board.countPieces()
+		const pawnMove = changedSquares.find(sq =>
+			this.board.pieceAt(sq.x, sq.y) != null
+			&& this.board.pieceAt(sq.x, sq.y).type
+				== ChessPieceType.Pawn) != null
+
+		// Keep track of 50 move rule.
+
+		if (numPiecesBefore == numPiecesAfter && !pawnMove)
+		{
+			this.fiftyMoveRule++
+
+			if (this.fiftyMoveRule >= 100)
+			{
+				this.endGame(null, '50 move rule.')
+				return
+			}
+		}
+
 		// Update remaining time on the clock.
-		// The players are swapped because the move was alraedy made.
+		// The players are swapped because the move was already made.
 
 		const player = this.board.turn == Colour.Black
 			? this.white : this.black
@@ -133,6 +246,8 @@ export class Game
 			this.lastMoveTime = now
 		}
 
+		// Broadcast the move to all subscribers.
+
 		for (const ws of this.subscribers)
 		{
 			if (ws.readyState != WebSocket.OPEN)
@@ -150,6 +265,43 @@ export class Game
 				}
 			 })
 		}
+
+		// Check for threefold repetition.
+
+		const count = this.addHistory()
+
+		if (count == 3)
+		{
+			this.endGame(null, 'Draw by threefold repetition.')
+			return
+		}
+
+		// Check if the game is over.
+
+		if (!this.board.ended())
+		{
+			return
+		}
+
+		// Check if the game is won by black.
+
+		if (this.board.turn == Colour.White && this.board.whiteInCheck())
+		{
+			this.endGame(Colour.Black, 'White is checkmated. Black wins.')
+			return
+		}
+
+		// Check if the game is won by white.
+
+		if (this.board.turn == Colour.Black && this.board.blackInCheck())
+		{
+			this.endGame(Colour.White, 'Black is checkmated. White wins.')
+			return
+		}
+
+		// The game must be a draw.
+
+		this.endGame(null, 'Draw by stalemate.')
 	}
 
 	/**

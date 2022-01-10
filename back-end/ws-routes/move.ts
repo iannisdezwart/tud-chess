@@ -89,6 +89,5 @@ export const move = (data: MoveData, ws: WebSocket) =>
 
 	// Make the move and broadcast it to all subscribers.
 
-	game.board.move(from, to)
 	game.sendMove(from, to)
 }

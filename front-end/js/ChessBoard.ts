@@ -29,9 +29,6 @@ class ChessBoard
 	whiteEnPassant: boolean[]
 	blackEnPassant: boolean[]
 
-	whiteKing: Square
-	blackKing: Square
-
 	turn: Colour
 	turnNumber: number
 
@@ -50,11 +47,40 @@ class ChessBoard
 		this.whiteEnPassant = Array(8).fill(false)
 		this.blackEnPassant = Array(8).fill(false)
 
-		this.whiteKing = null
-		this.blackKing = null
-
 		this.turn = Colour.White
 		this.turnNumber = 0
+	}
+
+	/**
+	 * Returns a board state string.
+	 */
+	boardStateString()
+	{
+		const {
+			board,
+			whiteKingMoved,
+			whiteLeftRookMoved,
+			whiteRightRookMoved,
+			blackKingMoved,
+			blackLeftRookMoved,
+			blackRightRookMoved,
+			whiteEnPassant,
+			blackEnPassant,
+			turn
+		} = this
+
+		return JSON.stringify({
+			board,
+			whiteKingMoved,
+			whiteLeftRookMoved,
+			whiteRightRookMoved,
+			blackKingMoved,
+			blackLeftRookMoved,
+			blackRightRookMoved,
+			whiteEnPassant,
+			blackEnPassant,
+			turn
+		})
 	}
 
 	toString()
@@ -102,9 +128,6 @@ class ChessBoard
 		board.whiteEnPassant = data.whiteEnPassant
 		board.blackEnPassant = data.blackEnPassant
 
-		board.whiteKing = data.whiteKing
-		board.blackKing = data.blackKing
-
 		board.turn = data.turn
 		board.turnNumber = data.turnNumber
 
@@ -144,6 +167,24 @@ class ChessBoard
 		const [ x, y ] = this.decodeCoord(coord)
 
 		this.board[y][x] = new ChessPiece(pieceType, colour)
+	}
+
+	countPieces()
+	{
+		let count = 0
+
+		for (let y = 0; y < 8; y++)
+		{
+			for (let x = 0; x < 8; x++)
+			{
+				if (this.board[y][x] != null)
+				{
+					count++
+				}
+			}
+		}
+
+		return count
 	}
 
 	computeScore()
@@ -271,7 +312,6 @@ class ChessBoard
 							Colour.White, ChessPieceType.King))
 						{
 							console.log(`white is in check because (${ piece.type }) ${ x } ${ y } can move to ${ move.x } ${ move.y }`)
-							this.whiteKing = new Square(move.x, move.y)
 							return true
 						}
 					}
@@ -302,7 +342,6 @@ class ChessBoard
 							Colour.Black, ChessPieceType.King))
 						{
 							console.log(`black is in check because (${ piece.type }) ${ x } ${ y } can move to ${ move.x } ${ move.y }`)
-							this.blackKing = new Square(move.x, move.y)
 							return true
 						}
 					}
@@ -323,7 +362,7 @@ class ChessBoard
 
 				if (piece != null && piece.colour == Colour.White)
 				{
-					const moves = this.possibleMoves(x, y, false)
+					const moves = this.possibleMoves(x, y, true)
 
 					if (moves.length > 0)
 					{
@@ -346,7 +385,7 @@ class ChessBoard
 
 				if (piece != null && piece.colour == Colour.Black)
 				{
-					const moves = this.possibleMoves(x, y, false)
+					const moves = this.possibleMoves(x, y, true)
 
 					if (moves.length > 0)
 					{

@@ -6,3 +6,27 @@ Todo:
 	- Make splash screen.
 	- Make a menu.
 	- Add resign and draw buttons.
+
+Todo game end:
+		Positions are not the same if a pawn that could have been
+		captured en passant can no longer be captured in this manner.
+		When a king or a rook is forced to move, it will lose its
+		castling rights, if any, only after it is moved.
+	- draw by dead position.
+	- draw by dead position and no time.
+	- draw by agreement.
+		A player wishing to offer a draw shall do so after having made
+		a move on the chessboard and before stopping his clock and
+		starting the opponent’s clock. An offer at any other time during
+		play is still valid but Article 12.6 must be considered. No
+		conditions can be attached to the offer. In both cases the offer
+		cannot be withdrawn and remains valid until the opponent accepts
+		it, rejects it orally, rejects it by touching a piece with the
+		intention of moving or capturing it, or the game is concluded in
+		some other way.
+	- win by resignation.
+	- win by checkmate.
+	- draw by threefold repetition (optional).
+		The player who is about to introduce the threefold repetition
+		is the first one to claim the draw.
+	- draw by 50 move rule (optional).

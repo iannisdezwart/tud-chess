@@ -103,7 +103,13 @@ body
 {
 	width: 100%;
 	height: 100%;
-	filter: drop-shadow(.1em .1em .1em rgba(0, 0, 0, 0.2))
+	filter: drop-shadow(.1em .1em .1em rgba(0, 0, 0, 0.2));
+	transition: transform 1s ease-out;
+}
+
+.board .piece.flipped
+{
+	transform: rotate(180deg);
 }
 
 .board .piece.selectable
@@ -166,6 +172,14 @@ body
 	border-radius: 5px;
 }
 
+.stats .top,
+.stats .bottom
+{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
 .stats .clock
 {
 	font-family: 'Roboto Mono', monospace;
@@ -210,4 +224,10 @@ body
 	margin-left: -20px;
 	width: 32px;
 	height: 32px;
+}
+
+.stats .end-game
+{
+	text-align: center;
+	font-style: italic;
 }
