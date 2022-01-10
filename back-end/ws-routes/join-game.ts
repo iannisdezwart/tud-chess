@@ -13,6 +13,9 @@ interface JoinGameData
 // This player will be added to a game when another player joins.
 let waitingPlayer: Player
 
+// One minute in milliseconds.
+const MINUTE = 60 * 1000
+
 /**
  * Matches a player with a waiting player.
  * @param { JoinGameData } data The data sent by the client.
@@ -50,13 +53,15 @@ export const joinGame = (data: JoinGameData, ws: WebSocket) =>
 		const player1 = {
 			ws: null, // Will be set when player 1 starts playing.
 			token: data.token,
-			username: data.username
+			username: data.username,
+			clock: 10 * MINUTE
 		}
 
 		const player2 = {
 			ws: null, // Will be set when player 2 starts playing.
 			token: waitingPlayer.token,
-			username: waitingPlayer.username
+			username: waitingPlayer.username,
+			clock: 10 * MINUTE
 		}
 
 		const game = new Game(gameID, player1, player2)
@@ -87,6 +92,7 @@ export const joinGame = (data: JoinGameData, ws: WebSocket) =>
 	waitingPlayer = {
 		ws,
 		token: data.token,
-		username: data.username
+		username: data.username,
+		clock: null
 	}
 }

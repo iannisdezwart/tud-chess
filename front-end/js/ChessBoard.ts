@@ -59,6 +59,8 @@ class ChessBoard
 
 	toString()
 	{
+		// Todo: optimise this.
+
 		return JSON.stringify(this)
 	}
 

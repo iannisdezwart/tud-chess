@@ -18,6 +18,12 @@ class HTMLChessBoard
 	whiteUsername: string
 	blackUsername: string
 
+	blackClock: number
+	whiteClock: number
+	latestMoveTime: number
+
+	static CLOCK_UPDATE_HANDLER_INTERVAL = 100
+
 	constructor(boardContainerEl: HTMLElement, player: Colour)
 	{
 		this.boardContainerEl = boardContainerEl
@@ -346,10 +352,12 @@ class HTMLChessBoard
 				const cell = document.createElement('div')
 				cell.classList.add('board-cell')
 
+				const flipped = y % 2 == 0 ? 'flipped' : ''
+
 				if (this.board.squareColour(x, y) == Colour.Black)
 				{
 					cell.innerHTML += /* html */ `
-					<div class="square">
+					<div class="square ${ flipped }">
 						<img src='/res/svg/board/dark-square.svg'>
 					</div>
 					`
@@ -357,7 +365,7 @@ class HTMLChessBoard
 				else
 				{
 					cell.innerHTML += /* html */ `
-					<div class="square">
+					<div class="square ${ flipped }">
 						<img src='/res/svg/board/light-square.svg'>
 					</div>
 					`
@@ -433,34 +441,24 @@ class HTMLChessBoard
 		<div class="stats">
 			<div class="top">
 				<div class="eaten-pieces"></div>
-				<div class="clock"></div>
 				<div class="username"></div>
+				<div class="clock"></div>
 			</div>
 
 			<div class="bottom">
-				<div class="username"></div>
 				<div class="clock"></div>
+				<div class="username"></div>
 				<div class="eaten-pieces"></div>
 			</div>
 		</div>
 		`)
 
-		this.renderStats()
-	}
+		// Display the usernames of the players.
 
-	renderStats()
-	{
 		const statsEl = this.boardContainerEl.querySelector('.stats')
 
-		const topEatenPiecesEl = statsEl.querySelector('.top .eaten-pieces')
-		const topClockEl = statsEl.querySelector('.top .clock')
 		const topUsernameEl = statsEl.querySelector('.top .username')
-
-		const bottomEatenPiecesEl = statsEl.querySelector('.bottom .eaten-pieces')
-		const bottomClockEl = statsEl.querySelector('.bottom .clock')
 		const bottomUsernameEl = statsEl.querySelector('.bottom .username')
-
-		const score = this.board.computeScore()
 
 		if (this.player == Colour.White)
 		{
@@ -472,5 +470,178 @@ class HTMLChessBoard
 			topUsernameEl.innerHTML = this.whiteUsername
 			bottomUsernameEl.innerHTML = this.blackUsername
 		}
+	}
+
+	/**
+	 * Returns a given millisecond clock in a human readable format.
+	 */
+	getClock(clock: number, isTurn: boolean)
+	{
+		// If needed, subtract the elapsed time since the last move.
+
+		let elapsedTime = Date.now() - this.latestMoveTime
+
+		if (!isTurn || this.board.turnNumber < 2)
+		{
+			elapsedTime = 0
+		}
+
+		const time = clock - elapsedTime
+
+		// Ensure the clock stays positive.
+
+		if (time < 0)
+		{
+			return `0:00.0`
+		}
+
+		// Calculate the minutes and seconds.
+
+		const seconds = Math.floor(time / 1000)
+		const minutes = Math.floor(seconds / 60)
+		const secondsLeft = seconds % 60
+
+		// Return a normal human readable string.
+
+		if (seconds > 10)
+		{
+			const mm = minutes.toFixed(0)
+			const ss = secondsLeft.toFixed(0).padStart(2, '0')
+
+			return `${ mm }:${ ss }`
+		}
+
+		// Return a human readable string with a tenth of a second.
+
+		const ss = secondsLeft.toFixed(0).padStart(2, '0')
+		const hundreds = Math.floor(time / 100) % 10
+
+		return `0:${ ss }.${ hundreds }`
+	}
+
+	/**
+	 * Returns the white player's clock in a human readable format.
+	 */
+	getWhiteClock()
+	{
+		return this.getClock(this.whiteClock, this.board.turn == Colour.White)
+	}
+
+	/**
+	 * Returns the black player's clock in a human readable format.
+	 */
+	getBlackClock()
+	{
+		return this.getClock(this.blackClock, this.board.turn == Colour.Black)
+	}
+
+	/**
+	 * Function that is called repetitively, updating the clocks
+	 * of both players every 100ms.
+	 * This function is stopped and restarted after every move.
+	 */
+	clockUpdateHandler(currentTurnNumber: number)
+	{
+		if (this.board.turnNumber != currentTurnNumber)
+		{
+			return
+		}
+
+		let whiteClockEl: HTMLElement
+		let blackClockEl: HTMLElement
+
+		// Get the elements of the clocks.
+
+		if (this.player == Colour.White)
+		{
+			whiteClockEl = this.boardContainerEl.querySelector('.stats .bottom .clock')
+			blackClockEl = this.boardContainerEl.querySelector('.stats .top .clock')
+		}
+		else
+		{
+			whiteClockEl = this.boardContainerEl.querySelector('.stats .top .clock')
+			blackClockEl = this.boardContainerEl.querySelector('.stats .bottom .clock')
+		}
+
+		// Update the clock elements to the current time on the clocks.
+
+		whiteClockEl.innerText = this.getWhiteClock()
+		blackClockEl.innerText = this.getBlackClock()
+
+		// Don't update the clocks before move 3.
+		// The opening moves are not timed.
+
+		if (this.board.turnNumber < 2)
+		{
+			return
+		}
+
+		// Schedule the next clock update.
+
+		setTimeout(() =>
+		{
+			this.clockUpdateHandler(currentTurnNumber)
+		}, HTMLChessBoard.CLOCK_UPDATE_HANDLER_INTERVAL)
+	}
+
+	/**
+	 * Starts updating the clocks of both players.
+	 */
+	updateClocks()
+	{
+		// Start updating the clocks.
+
+		this.clockUpdateHandler(this.board.turnNumber)
+	}
+
+	/**
+	 * Updates the score indicators of both players.
+	 */
+	updateScore()
+	{
+		const score = this.board.computeScore()
+
+		// Create an HTML string for both players' score indicators.
+
+		const whiteScoreIndicator = /* html */ `
+		${ new ChessPiece(ChessPieceType.Pawn, Colour.Black).svg().repeat(score.blackPawnsEaten) }
+		${ new ChessPiece(ChessPieceType.Knight, Colour.Black).svg().repeat(score.blackKnightsEaten) }
+		${ new ChessPiece(ChessPieceType.Bishop, Colour.Black).svg().repeat(score.blackBishopsEaten) }
+		${ new ChessPiece(ChessPieceType.Rook, Colour.Black).svg().repeat(score.blackRooksEaten) }
+		${ new ChessPiece(ChessPieceType.Queen, Colour.Black).svg().repeat(score.blackQueensEaten) }
+		`
+
+		const blackScoreIndicator = /* html */ `
+		${ new ChessPiece(ChessPieceType.Pawn, Colour.White).svg().repeat(score.whitePawnsEaten) }
+		${ new ChessPiece(ChessPieceType.Knight, Colour.White).svg().repeat(score.whiteKnightsEaten) }
+		${ new ChessPiece(ChessPieceType.Bishop, Colour.White).svg().repeat(score.whiteBishopsEaten) }
+		${ new ChessPiece(ChessPieceType.Rook, Colour.White).svg().repeat(score.whiteRooksEaten) }
+		${ new ChessPiece(ChessPieceType.Queen, Colour.White).svg().repeat(score.whiteQueensEaten) }
+		`
+
+		const statsEl = this.boardContainerEl.querySelector('.stats')
+
+		const topScoreEl = statsEl.querySelector('.top .eaten-pieces')
+		const bottomScoreEl = statsEl.querySelector('.bottom .eaten-pieces')
+
+		if (this.player == Colour.White)
+		{
+			topScoreEl.innerHTML = blackScoreIndicator
+			bottomScoreEl.innerHTML = whiteScoreIndicator
+		}
+		else
+		{
+			topScoreEl.innerHTML = whiteScoreIndicator
+			bottomScoreEl.innerHTML = blackScoreIndicator
+		}
+	}
+
+	/**
+	 * Handles all the updates that need to be done after a move.
+	 */
+	update()
+	{
+		this.updateClocks()
+		this.updateScore()
 	}
 }

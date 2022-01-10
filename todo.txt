@@ -1,7 +1,6 @@
 Maybe:
 	- Add the possibility of drawing arrows.
-	- Add a clock.
-	- Add a score indicator.
+	- Animate moves.
 
 Todo:
 	- Make splash screen.

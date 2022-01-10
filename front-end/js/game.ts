@@ -4,8 +4,14 @@ interface GameStateData
 	board: string
 	turn: Colour
 	player: Colour
-	whiteUsername: string
-	blackUsername: string
+	usernames: {
+		white: string
+		black: string
+	}
+	clocks: {
+		white: number
+		black: number
+	}
 }
 
 interface MoveData
@@ -14,6 +20,10 @@ interface MoveData
 	from: Square
 	to: Square
 	turnNumber: number
+	clocks: {
+		white: number
+		black: number
+	}
 }
 
 // The game ID is the last part of the URL.
@@ -39,9 +49,16 @@ addEventListener('DOMContentLoaded', async () =>
 		}
 
 		board.setBoard(data.board)
-		board.whiteUsername = data.whiteUsername
-		board.blackUsername = data.blackUsername
+
+		board.whiteUsername = data.usernames.white
+		board.blackUsername = data.usernames.black
+
+		board.whiteClock = data.clocks.white
+		board.blackClock = data.clocks.black
+		board.latestMoveTime = Date.now()
+
 		board.render()
+		board.update()
 	})
 
 	// Receive the game state updates.
@@ -52,5 +69,11 @@ addEventListener('DOMContentLoaded', async () =>
 		{
 			board.move(data.from, data.to)
 		}
+
+		board.whiteClock = data.clocks.white
+		board.blackClock = data.clocks.black
+		board.latestMoveTime = Date.now()
+
+		board.update()
 	})
 })

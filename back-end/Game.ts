@@ -9,6 +9,7 @@ export interface Player
 	ws: WebSocket
 	token: string
 	username: string
+	clock: number
 }
 
 /**
@@ -30,6 +31,9 @@ export class Game
 	// The chess board.
 	board: ChessBoard
 
+	// The time of the last move.
+	lastMoveTime: number
+
 	constructor(id: string, player1: Player, player2: Player)
 	{
 		this.id = id
@@ -50,27 +54,85 @@ export class Game
 	}
 
 	/**
+	 * Calculates the current clock for both players.
+	 */
+	calculateClocks()
+	{
+		const now = Date.now()
+		const turn = this.board.turn
+
+		let white = this.white.clock
+		let black = this.black.clock
+
+		// Only subtract time if it's the player's turn and
+		// the second move has been made.
+		// The opening moves don't count as time.
+
+		if (turn == Colour.White && this.board.turnNumber >= 2)
+		{
+			white = this.white.clock - (now - this.lastMoveTime)
+		}
+		else if (turn == Colour.Black && this.board.turnNumber >= 2)
+		{
+			black = this.black.clock - (now - this.lastMoveTime)
+		}
+
+		return { white, black }
+	}
+
+	/**
 	 * Sends the current game state to a given WebSocket.
 	 */
 	sendGameState(ws: WebSocket)
 	{
 		const player = ws == this.black.ws ? Colour.Black : Colour.White
+		const clocks = this.calculateClocks()
 
 		send(ws, {
 			type: 'game-state',
 			board: this.board.toString(),
 			turn: this.board.turn,
 			player,
-			whiteUsername: this.white.username,
-			blackUsername: this.black.username
+			usernames: {
+				white: this.white.username,
+				black: this.black.username
+			},
+			clocks
 		})
 	}
 
 	/**
-	 * Sends a move to all subscribers.
+	 * Sends a move to all subscribers and updates the clock for
+	 * the player who made the move.
 	 */
 	sendMove(from: Square, to: Square)
 	{
+		// Update remaining time on the clock.
+		// The players are swapped because the move was alraedy made.
+
+		const player = this.board.turn == Colour.Black
+			? this.white : this.black
+
+		if (this.lastMoveTime == null)
+		{
+			// The two opening moves don't count as time.
+
+			if (this.board.turnNumber == 2)
+			{
+				this.lastMoveTime = Date.now()
+			}
+		}
+		else
+		{
+			// Subtract the time since the last move.
+
+			const now = Date.now()
+			const elapsed = now - this.lastMoveTime
+
+			player.clock = player.clock - elapsed
+			this.lastMoveTime = now
+		}
+
 		for (const ws of this.subscribers)
 		{
 			if (ws.readyState != WebSocket.OPEN)
@@ -81,7 +143,11 @@ export class Game
 			send(ws, {
 				type: 'move',
 				from, to,
-				turnNumber: this.board.turnNumber
+				turnNumber: this.board.turnNumber,
+				clocks: {
+					white: this.white.clock,
+					black: this.black.clock
+				}
 			 })
 		}
 	}

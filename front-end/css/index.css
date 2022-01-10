@@ -3,13 +3,15 @@
 	--square-size: 4em;
 	--board-border-size: .5;
 	--board-size: calc(var(--square-size) * 8);
+	--accent-colour: #00Bfff;
+	--light-accent-colour: #8BCDE5;
 }
 
 body
 {
+	font-family: 'Open Sans', sans-serif;
+
 	margin: 0;
-	background-color: #777;
-	height: 100vh;
 
 	display: flex;
 	flex-direction: column;
@@ -36,6 +38,14 @@ body
 
 @media (max-width: 800px)
 {
+	.chess-board-container
+	{
+		flex-direction: column;
+	}
+}
+
+@media (max-width: 900px)
+{
 	:root
 	{
 		--square-size: 3em;
@@ -57,7 +67,9 @@ body
 
 .board-border
 {
-	border: calc(var(--square-size) * var(--board-border-size)) solid rgb(91, 62, 30);
+	margin: 2em 0;
+	border: calc(var(--square-size) * var(--board-border-size)) solid var(--light-accent-colour);
+	border-radius: 5px;
 }
 
 .board
@@ -91,6 +103,7 @@ body
 {
 	width: 100%;
 	height: 100%;
+	filter: drop-shadow(.1em .1em .1em rgba(0, 0, 0, 0.2))
 }
 
 .board .piece.selectable
@@ -123,6 +136,11 @@ body
 	pointer-events: none;
 }
 
+.square.flipped img
+{
+	transform: rotate(180deg);
+}
+
 .board .legal-move::after
 {
 	content: '';
@@ -135,4 +153,61 @@ body
 	height: 100%;
 
 	background: rgba(0, 255, 0, 0.2);
+}
+
+.stats
+{
+	padding: 2em;
+	margin: 2em;
+
+	background-color: var(--accent-colour);
+	color: #fff;
+
+	border-radius: 5px;
+}
+
+.stats .clock
+{
+	font-family: 'Roboto Mono', monospace;
+	font-size: 2em;
+	text-align: center;
+
+	width: 130px;
+	padding: .25em .5em;
+	margin: .5em;
+	border-radius: 5px;
+
+	background-color: #fff;
+	color: var(--accent-colour);
+}
+
+.stats .username
+{
+	text-align: center;
+	font-style: italic;
+}
+
+.stats .eaten-pieces
+{
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: center;
+	margin-left: 20px;
+}
+
+.stats .top .eaten-pieces
+{
+	margin-bottom: 1em;
+}
+
+.stats .bottom .eaten-pieces
+{
+	margin-top: 1em;
+}
+
+.stats .eaten-pieces img
+{
+	margin-left: -20px;
+	width: 32px;
+	height: 32px;
 }
