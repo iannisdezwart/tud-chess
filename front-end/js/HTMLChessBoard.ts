@@ -459,18 +459,18 @@ class HTMLChessBoard
 
 		const statsEl = this.boardContainerEl.querySelector('.stats')
 
-		const topUsernameEl = statsEl.querySelector('.top .username')
-		const bottomUsernameEl = statsEl.querySelector('.bottom .username')
+		const topUsernameEl = statsEl.querySelector('.top .username') as HTMLElement
+		const bottomUsernameEl = statsEl.querySelector('.bottom .username') as HTMLElement
 
 		if (this.player == Colour.White)
 		{
-			topUsernameEl.innerHTML = this.blackUsername
-			bottomUsernameEl.innerHTML = this.whiteUsername
+			topUsernameEl.innerText = this.blackUsername
+			bottomUsernameEl.innerText = this.whiteUsername
 		}
 		else
 		{
-			topUsernameEl.innerHTML = this.whiteUsername
-			bottomUsernameEl.innerHTML = this.blackUsername
+			topUsernameEl.innerText = this.whiteUsername
+			bottomUsernameEl.innerText = this.blackUsername
 		}
 	}
 
@@ -658,8 +658,8 @@ class HTMLChessBoard
 
 		// Show the reason for the end of the game.
 
-		const endGameEl = this.boardContainerEl.querySelector('.end-game')
-		endGameEl.innerHTML = reason
+		const endGameEl = this.boardContainerEl.querySelector('.end-game') as HTMLElement
+		endGameEl.innerText = reason
 
 		// Flip the opponent's king upside down.
 
