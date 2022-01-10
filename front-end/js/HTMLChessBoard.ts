@@ -10,8 +10,9 @@ class HTMLChessBoard
 
 	player: Colour
 
-	draggingPiece: HTMLElement
-	draggingPieceSquare: Square
+	draggingPiece: boolean
+	clickedPiece: HTMLElement
+	clickedPieceSquare: Square
 
 	unselectable = false
 
@@ -112,6 +113,31 @@ class HTMLChessBoard
 	 */
 	touchDownHandler(touch: Touch, e: Event)
 	{
+		// If we previously clicked on a piece and we now click on
+		// a legal move square, we will perfome the move.
+
+		const toSquare = this.pointedSquare(touch)
+		let moved = false
+
+		if (this.clickedPiece != null && toSquare != null
+			&& this.getSquare(toSquare).classList.contains('legal-move'))
+		{
+			this.performMove(this.clickedPieceSquare, toSquare)
+			moved = true
+		}
+
+		// Remove the old legal move highlights.
+
+		this.clearLegalMoves()
+
+		// If we already moved the piece,
+		// we don't have to do anything else.
+
+		if (moved)
+		{
+			return
+		}
+
 		// Check if the user is hovering over a piece.
 
 		const target = touch.target as HTMLElement
@@ -128,12 +154,13 @@ class HTMLChessBoard
 
 		// Get the dragged piece and its square.
 
-		this.draggingPiece = target
-		this.draggingPieceSquare = this.pointedSquare(touch)
+		this.clickedPiece = target
+		this.clickedPieceSquare = this.pointedSquare(touch)
+		this.draggingPiece = true
 
 		// Show the legal moves.
 
-		const { x: xFrom, y: yFrom } = this.draggingPieceSquare
+		const { x: xFrom, y: yFrom } = this.clickedPieceSquare
 		const legalMoves = this.board.possibleMoves(xFrom, yFrom, true)
 
 		for (const square of legalMoves)
@@ -148,7 +175,7 @@ class HTMLChessBoard
 	 */
 	touchMoveHandler(touch: Touch, e: Event)
 	{
-		if (this.draggingPiece == null)
+		if (!this.draggingPiece)
 		{
 			return
 		}
@@ -160,8 +187,8 @@ class HTMLChessBoard
 		// Update the position of the dragged piece.
 
 		const { clientX, clientY } = touch
-		const img = this.draggingPiece.querySelector<HTMLImageElement>('img')
-		const rect = this.draggingPiece.getBoundingClientRect()
+		const img = this.clickedPiece.querySelector<HTMLImageElement>('img')
+		const rect = this.clickedPiece.getBoundingClientRect()
 
 		const middleX = rect.x + rect.width / 2
 		const middleY = rect.y + rect.height / 2
@@ -176,9 +203,9 @@ class HTMLChessBoard
 	/**
 	 * Handles the end of a drag.
 	 */
-	async touchUpHandler(touch: Touch, e: Event)
+	touchUpHandler(touch: Touch, e: Event)
 	{
-		if (this.draggingPiece == null)
+		if (!this.draggingPiece)
 		{
 			return
 		}
@@ -190,7 +217,7 @@ class HTMLChessBoard
 		// Get the square where the piece came from and where
 		// it was dropped.
 
-		const fromSquare = this.draggingPieceSquare
+		const fromSquare = this.clickedPieceSquare
 		const toSquare = this.pointedSquare(touch)
 
 		let moveIsLegal = false
@@ -203,18 +230,11 @@ class HTMLChessBoard
 
 		// Undo the visual translations on the piece.
 
-		const img = this.draggingPiece.querySelector<HTMLImageElement>('img')
+		const img = this.clickedPiece.querySelector<HTMLImageElement>('img')
 
 		img.style.transform = null
 		img.style.zIndex = null
-		this.draggingPiece = null
-
-		// Remove the legal move highlights.
-
-		for (const square of [].slice.call(document.querySelectorAll('.legal-move')))
-		{
-			square.classList.remove('legal-move')
-		}
+		this.draggingPiece = false
 
 		// If the move is not legal, return the piece to its original
 		// position.
@@ -224,6 +244,27 @@ class HTMLChessBoard
 			return
 		}
 
+		// The move is legal, so we can perform it.
+
+		this.performMove(fromSquare, toSquare)
+	}
+
+	/**
+	 * Clears the legal move highlights.
+	 */
+	clearLegalMoves()
+	{
+		for (const square of [].slice.call(document.querySelectorAll('.legal-move')))
+		{
+			square.classList.remove('legal-move')
+		}
+	}
+
+	/**
+	 * Performs a move.
+	 */
+	async performMove(fromSquare: Square, toSquare: Square)
+	{
 		// Perform the move locally.
 
 		let promotion: ChessPieceType
@@ -232,6 +273,10 @@ class HTMLChessBoard
 			promotion = await this.promptPromotion()
 			return promotion
 		})
+
+		// Clear the legal move highlights.
+
+		this.clearLegalMoves()
 
 		// Send the move to the server.
 
