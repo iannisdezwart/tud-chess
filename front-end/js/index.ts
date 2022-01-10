@@ -4,11 +4,32 @@ interface GameReadyData
 	gameID: string
 }
 
+interface ServerStatsData
+{
+	type: 'server-stats'
+	games: number
+	players: number
+	webSocketConnections: number
+}
+
 // If a game is ready, join it.
 
 receive('game-ready', (data: GameReadyData) =>
 {
 	location.href = `/play/${ data.gameID }`
+})
+
+// When we get server stats, dipslay them.
+
+receive('server-stats', (data: ServerStatsData) =>
+{
+	const playerCount = document.querySelector('.stats .player-count') as HTMLElement
+	const gameCount = document.querySelector('.stats .game-count') as HTMLElement
+	const webSocketCount = document.querySelector('.stats .websocket-connection-count') as HTMLElement
+
+	playerCount.innerText = data.players.toString()
+	gameCount.innerText = data.games.toString()
+	webSocketCount.innerText = data.webSocketConnections.toString()
 })
 
 /**
@@ -25,10 +46,10 @@ const joinGame = async () =>
 	document.querySelector('.waiting').classList.add('visible')
 }
 
-// Handle the username input.
-
 addEventListener('DOMContentLoaded', () =>
 {
+	// Handle the username input.
+
 	const usernameInput = document.querySelector('#username') as HTMLInputElement
 	const username = localStorage.getItem('username')
 
@@ -43,4 +64,10 @@ addEventListener('DOMContentLoaded', () =>
 	{
 		localStorage.setItem('username', usernameInput.value)
 	})
+
+	// Fetch server stats.
+
+	send({ type: 'get-server-stats' })
+
+	setInterval(() => send({ type: 'get-server-stats' }), 500)
 })

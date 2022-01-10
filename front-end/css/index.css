@@ -127,6 +127,9 @@ body
 	height: 100%;
 
 	pointer-events: none;
+
+	/* Improves performance, tested in Chromium. */
+	will-change: transform;
 }
 
 .board .square img
@@ -151,14 +154,16 @@ body
 {
 	content: '';
 	position: absolute;
-	z-index: 1;
-	left: 0;
-	top: 0;
+	left: 50%;
+	top: 50%;
 
-	width: 100%;
-	height: 100%;
+	transform: translate(-50%, -50%);
 
-	background: rgba(0, 255, 0, 0.2);
+	width: 30%;
+	height: 30%;
+
+	border-radius: 50%;
+	background: rgba(0, 0, 0, 0.3);
 }
 
 .stats
@@ -263,4 +268,39 @@ body
 {
 	text-align: center;
 	font-style: italic;
+}
+
+.promotion
+{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 3;
+
+	color: #fff;
+	background-color: rgba(0, 0, 0, 0.7);
+	border-radius: 5px;
+
+	padding: 1em;
+}
+
+.promotion-pieces
+{
+	margin-top: 1em;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+}
+
+.promotion-pieces img
+{
+	width: calc(1.5 * var(--square-size));
+	height: calc(1.5 * var(--square-size));
+	filter: drop-shadow(.1em .1em .1em rgba(0, 0, 0, 0.2));
+	cursor: pointer;
 }

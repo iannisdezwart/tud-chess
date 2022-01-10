@@ -8,6 +8,7 @@ import { move } from './ws-routes/move.js'
 import { offerDraw } from './ws-routes/offer-draw.js'
 import { playGame } from './ws-routes/play-game.js'
 import { resign } from './ws-routes/resign.js'
+import { serverStats } from './ws-routes/server-stats.js'
 import { spectateGame } from './ws-routes/spectate-game.js'
 
 const PORT = +process.argv[2] || 3000
@@ -15,7 +16,8 @@ const PORT = +process.argv[2] || 3000
 // Create the HTTP server.
 
 export const app = express()
-const server = app.listen(PORT, () => console.log(`Server listening on port ${ PORT }`))
+export const server = app.listen(PORT,
+	() => console.log(`Server listening on port ${ PORT }`))
 
 // Include the static files in the `front-end` directory.
 
@@ -27,7 +29,7 @@ app.use(router)
 
 // Start the WebSocket server at the same port as the HTTP server.
 
-const wsServer = new WebSocketServer({ server })
+export const wsServer = new WebSocketServer({ server })
 
 // Handle new WebSocket connections.
 
@@ -105,6 +107,11 @@ wsServer.on('connection', ws =>
 			case 'offer-draw':
 			{
 				offerDraw(data, ws)
+			}
+
+			case 'get-server-stats':
+			{
+				serverStats(ws)
 			}
 		}
 	})

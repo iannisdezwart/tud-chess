@@ -9,6 +9,7 @@ interface MoveData
 	token: string
 	from: Square
 	to: Square
+	promotion: ChessPieceType
 }
 
 /**
@@ -89,5 +90,7 @@ export const move = (data: MoveData, ws: WebSocket) =>
 
 	// Make the move and broadcast it to all subscribers.
 
-	game.sendMove(from, to)
+	const promotion = data.promotion ?? ChessPieceType.Queen
+
+	game.sendMove(from, to, promotion)
 }

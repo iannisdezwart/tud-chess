@@ -224,6 +224,15 @@ class HTMLChessBoard
 			return
 		}
 
+		// Perform the move locally.
+
+		let promotion: ChessPieceType
+
+		await this.move(fromSquare, toSquare, async () => {
+			promotion = await this.promptPromotion()
+			return promotion
+		})
+
 		// Send the move to the server.
 
 		send({
@@ -232,11 +241,8 @@ class HTMLChessBoard
 			token: await userToken(),
 			from: fromSquare,
 			to: toSquare,
+			promotion
 		})
-
-		// Perform the move locally.
-
-		this.move(fromSquare, toSquare)
 	}
 
 	/**
@@ -254,9 +260,60 @@ class HTMLChessBoard
 	}
 
 	/**
+	 * Prompts the user to choose a piece to promote to.
+	 */
+	promptPromotion(): Promise<ChessPieceType>
+	{
+		const player = this.player
+
+		document.body.insertAdjacentHTML('beforeend', /* html */ `
+		<div class="promotion">
+			<div class="promotion-title">Promote to:</div>
+
+			<div class="promotion-pieces">
+				<div class="queen">
+					${ new ChessPiece(ChessPieceType.Queen, player).svg() }
+				</div>
+
+				<div class="rook">
+					${ new ChessPiece(ChessPieceType.Rook, player).svg() }
+				</div>
+
+				<div class="bishop">
+					${ new ChessPiece(ChessPieceType.Bishop, player).svg() }
+				</div>
+
+				<div class="knight">
+					${ new ChessPiece(ChessPieceType.Knight, player).svg() }
+				</div>
+			</div>
+		</div>
+		`)
+
+		const queen = document.querySelector('.promotion-pieces .queen')
+		const rook = document.querySelector('.promotion-pieces .rook')
+		const bishop = document.querySelector('.promotion-pieces .bishop')
+		const knight = document.querySelector('.promotion-pieces .knight')
+
+		return new Promise(resolve =>
+		{
+			const choose = (choice: ChessPieceType) =>
+			{
+				document.querySelector('.promotion').remove()
+				resolve(choice)
+			}
+
+			queen.addEventListener('click', () => choose(ChessPieceType.Queen))
+			rook.addEventListener('click', () => choose(ChessPieceType.Rook))
+			bishop.addEventListener('click', () => choose(ChessPieceType.Bishop))
+			knight.addEventListener('click', () => choose(ChessPieceType.Knight))
+		})
+	}
+
+	/**
 	 * Performs a move on the board.
 	 */
-	move(from: Square, to: Square)
+	async move(from: Square, to: Square, promotion: () => Promise<ChessPieceType>)
 	{
 		// Resets any draw offers.
 
@@ -271,7 +328,7 @@ class HTMLChessBoard
 
 		// Perform the move.
 
-		const changedSquares = this.board.move(from, to)
+		const changedSquares = await this.board.move(from, to, promotion)
 
 		// Update the board.
 
@@ -314,6 +371,15 @@ class HTMLChessBoard
 
 		// Update the selectable pieces.
 
+		this.updateSelectablePieces()
+	}
+
+	/**
+	 * Updates the selectable pieces on the board.
+	 * Called after a move is made, and after the game has ended.
+	 */
+	updateSelectablePieces()
+	{
 		for (let y = 0; y < 8; y++)
 		{
 			for (let x = 0; x < 8; x++)
@@ -717,6 +783,11 @@ class HTMLChessBoard
 		// Stop the clock update handler.
 
 		this.board.turnNumber++
+
+		// Make the board unselecatble.
+
+		this.unselectable = true
+		this.updateSelectablePieces()
 
 		// Show the reason for the end of the game.
 

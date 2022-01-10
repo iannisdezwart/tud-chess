@@ -1878,7 +1878,7 @@ class ChessBoard
 	 * Performs a move on the board.
 	 * Returns the squares that were changed.
 	 */
-	move(fromSquare: Square, toSquare: Square)
+	async move(fromSquare: Square, toSquare: Square, promotion: () => Promise<ChessPieceType>)
 	{
 		const { x: xFrom, y: yFrom } = fromSquare
 		const { x: xTo, y: yTo } = toSquare
@@ -2021,11 +2021,7 @@ class ChessBoard
 
 		if (movedPiece.is(Colour.White, ChessPieceType.Pawn) && yTo == 7)
 		{
-			// Todo: show promotion prompt.
-
-			const promotion = ChessPieceType.Queen as ChessPieceType
-
-			switch (promotion)
+			switch (await promotion())
 			{
 				case ChessPieceType.Queen:
 				{
@@ -2059,11 +2055,7 @@ class ChessBoard
 
 		if (movedPiece.is(Colour.Black, ChessPieceType.Pawn) && yTo == 0)
 		{
-			// Todo: show promotion prompt.
-
-			const promotion = ChessPieceType.Queen as ChessPieceType
-
-			switch (promotion)
+			switch (await promotion())
 			{
 				case ChessPieceType.Queen:
 				{

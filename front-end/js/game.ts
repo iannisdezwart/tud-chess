@@ -25,6 +25,7 @@ interface MoveData
 		white: number
 		black: number
 	}
+	promotion: ChessPieceType
 }
 
 interface EndData
@@ -86,7 +87,8 @@ addEventListener('DOMContentLoaded', async () =>
 	{
 		if (board.board.turnNumber != data.turnNumber)
 		{
-			board.move(data.from, data.to)
+			board.move(data.from, data.to,
+				() => Promise.resolve(data.promotion))
 		}
 
 		board.whiteClock = data.clocks.white

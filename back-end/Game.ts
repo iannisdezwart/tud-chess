@@ -214,7 +214,7 @@ export class Game
 	 * Sends a move to all subscribers and updates the clock for
 	 * the player who made the move.
 	 */
-	sendMove(from: Square, to: Square)
+	async sendMove(from: Square, to: Square, promotion: ChessPieceType)
 	{
 		// Reset draw offers.
 
@@ -224,7 +224,8 @@ export class Game
 		// Perform the move.
 
 		const numPiecesBefore = this.board.countPieces()
-		const changedSquares = this.board.move(from, to)
+		const changedSquares = await this.board.move(from, to,
+			() => Promise.resolve(promotion))
 		const numPiecesAfter = this.board.countPieces()
 		const pawnMove = changedSquares.find(sq =>
 			this.board.pieceAt(sq.x, sq.y) != null
@@ -286,7 +287,8 @@ export class Game
 				clocks: {
 					white: this.white.clock,
 					black: this.black.clock
-				}
+				},
+				promotion
 			 })
 		}
 
