@@ -17,9 +17,46 @@ body
 	align-items: center;
 }
 
+.waiting
+{
+	display: none;
+}
+
+.visible
+{
+	display: unset;
+}
+
 .chess-board-container
 {
-	display: inline-block; /* fixes width of .board */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+@media (max-width: 800px)
+{
+	:root
+	{
+		--square-size: 3em;
+	}
+}
+
+@media (max-width: 600px)
+{
+	:root
+	{
+		--square-size: calc(100vw / 9);
+	}
+
+	.chess-board-container
+	{
+		flex-direction: column;
+	}
+}
+
+.board-border
+{
 	border: calc(var(--square-size) * var(--board-border-size)) solid rgb(91, 62, 30);
 }
 

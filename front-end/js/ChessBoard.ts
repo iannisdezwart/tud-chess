@@ -146,30 +146,107 @@ class ChessBoard
 
 	computeScore()
 	{
-		let whiteScore = 0
-		let blackScore = 0
+		let whitePawns = 0
+		let whiteKnights = 0
+		let whiteBishops = 0
+		let whiteRooks = 0
+		let whiteQueens = 0
+
+		let blackPawns = 0
+		let blackKnights = 0
+		let blackBishops = 0
+		let blackRooks = 0
+		let blackQueens = 0
 
 		for (let y = 0; y < 8; y++)
 		{
 			for (let x = 0; x < 8; x++)
 			{
-				const piece = this.pieceAt(x, y)
+				const piece = this.board[y][x]
 
-				if (piece != null)
+				if (piece == null)
 				{
-					if (piece.colour == Colour.White)
-					{
-						whiteScore += piece.value()
-					}
-					else
-					{
-						blackScore += piece.value()
-					}
+					continue
+				}
+
+				if (piece.is(Colour.White, ChessPieceType.Pawn))
+				{
+					whitePawns++
+				}
+				else if (piece.is(Colour.White, ChessPieceType.Knight))
+				{
+					whiteKnights++
+				}
+				else if (piece.is(Colour.White, ChessPieceType.Bishop))
+				{
+					whiteBishops++
+				}
+				else if (piece.is(Colour.White, ChessPieceType.Rook))
+				{
+					whiteRooks++
+				}
+				else if (piece.is(Colour.White, ChessPieceType.Queen))
+				{
+					whiteQueens++
+				}
+				else if (piece.is(Colour.Black, ChessPieceType.Pawn))
+				{
+					blackPawns++
+				}
+				else if (piece.is(Colour.Black, ChessPieceType.Knight))
+				{
+					blackKnights++
+				}
+				else if (piece.is(Colour.Black, ChessPieceType.Bishop))
+				{
+					blackBishops++
+				}
+				else if (piece.is(Colour.Black, ChessPieceType.Rook))
+				{
+					blackRooks++
+				}
+				else if (piece.is(Colour.Black, ChessPieceType.Queen))
+				{
+					blackQueens++
 				}
 			}
 		}
 
-		return [ whiteScore, blackScore ]
+		const whitePawnsEaten   = Math.max(0, 8 - whitePawns)
+		const whiteKnightsEaten = Math.max(0, 2 - whiteKnights)
+		const whiteBishopsEaten = Math.max(0, 2 - whiteBishops)
+		const whiteRooksEaten   = Math.max(0, 2 - whiteRooks)
+		const whiteQueensEaten  = Math.max(0, 1 - whiteQueens)
+
+		const blackPawnsEaten   = Math.max(0, 8 - blackPawns)
+		const blackKnightsEaten = Math.max(0, 2 - blackKnights)
+		const blackBishopsEaten = Math.max(0, 2 - blackBishops)
+		const blackRooksEaten   = Math.max(0, 2 - blackRooks)
+		const blackQueensEaten  = Math.max(0, 1 - blackQueens)
+
+		const whiteScore = whitePawnsEaten + 3 * whiteKnightsEaten
+			+ 3 * whiteBishopsEaten    + 5 * whiteRooksEaten
+			+ 9 * whiteQueensEaten
+
+		const blackScore = blackPawnsEaten + 3 * blackKnightsEaten
+			+ 3 * blackBishopsEaten    + 5 * blackRooksEaten
+			+ 9 * blackQueensEaten
+
+		return {
+			whiteScore,
+			whitePawnsEaten,
+			whiteKnightsEaten,
+			whiteBishopsEaten,
+			whiteRooksEaten,
+			whiteQueensEaten,
+
+			blackScore,
+			blackPawnsEaten,
+			blackKnightsEaten,
+			blackBishopsEaten,
+			blackRooksEaten,
+			blackQueensEaten,
+		}
 	}
 
 	whiteInCheck()
@@ -1782,7 +1859,7 @@ class ChessBoard
 
 		// Castling
 
-		if (movedPiece.is(Colour.White, ChessPieceType.King) && xTo - xFrom == 2)
+		if (movedPiece.is(Colour.White, ChessPieceType.King) && xFrom - xTo == 2)
 		{
 			this.board[yTo][3] = new ChessPiece(ChessPieceType.Rook, Colour.White)
 			this.board[yTo][0] = null
@@ -1791,7 +1868,7 @@ class ChessBoard
 			changedSquares.push(new Square(0, yTo))
 		}
 
-		if (movedPiece.is(Colour.White, ChessPieceType.King) && xFrom - xTo == 2)
+		if (movedPiece.is(Colour.White, ChessPieceType.King) && xTo - xFrom == 2)
 		{
 			this.board[yTo][5] = new ChessPiece(ChessPieceType.Rook, Colour.White)
 			this.board[yTo][7] = null
@@ -1800,7 +1877,7 @@ class ChessBoard
 			changedSquares.push(new Square(7, yTo))
 		}
 
-		if (movedPiece.is(Colour.Black, ChessPieceType.King) && xTo - xFrom == 2)
+		if (movedPiece.is(Colour.Black, ChessPieceType.King) && xFrom - xTo == 2)
 		{
 			this.board[yTo][3] = new ChessPiece(ChessPieceType.Rook, Colour.Black)
 			this.board[yTo][0] = null
@@ -1809,7 +1886,7 @@ class ChessBoard
 			changedSquares.push(new Square(0, yTo))
 		}
 
-		if (movedPiece.is(Colour.Black, ChessPieceType.King) && xFrom - xTo == 2)
+		if (movedPiece.is(Colour.Black, ChessPieceType.King) && xTo - xFrom == 2)
 		{
 			this.board[yTo][5] = new ChessPiece(ChessPieceType.Rook, Colour.Black)
 			this.board[yTo][7] = null

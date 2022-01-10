@@ -8,6 +8,7 @@ export interface Player
 {
 	ws: WebSocket
 	token: string
+	username: string
 }
 
 /**
@@ -15,6 +16,9 @@ export interface Player
  */
 export class Game
 {
+	// The ID of the game.
+	id: string
+
 	// The two players.
 	white: Player
 	black: Player
@@ -26,8 +30,10 @@ export class Game
 	// The chess board.
 	board: ChessBoard
 
-	constructor(player1: Player, player2: Player)
+	constructor(id: string, player1: Player, player2: Player)
 	{
+		this.id = id
+
 		if (Math.random() < 0.5)
 		{
 			this.white = player1
@@ -40,7 +46,6 @@ export class Game
 		}
 
 		this.subscribers = new Set()
-
 		this.board = ChessBoard.generateDefault()
 	}
 
@@ -55,7 +60,9 @@ export class Game
 			type: 'game-state',
 			board: this.board.toString(),
 			turn: this.board.turn,
-			player
+			player,
+			whiteUsername: this.white.username,
+			blackUsername: this.black.username
 		})
 	}
 
@@ -77,6 +84,14 @@ export class Game
 				turnNumber: this.board.turnNumber
 			 })
 		}
+	}
+
+	/**
+	 * Removes this game from the list of games.
+	 */
+	destroy()
+	{
+		games.delete(this.id)
 	}
 }
 

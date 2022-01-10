@@ -15,6 +15,9 @@ class HTMLChessBoard
 
 	unselectable = false
 
+	whiteUsername: string
+	blackUsername: string
+
 	constructor(boardContainerEl: HTMLElement, player: Colour)
 	{
 		this.boardContainerEl = boardContainerEl
@@ -327,6 +330,9 @@ class HTMLChessBoard
 	 */
 	render()
 	{
+		const boardBorderEl = document.createElement('div')
+		boardBorderEl.classList.add('board-border')
+
 		this.boardEl = document.createElement('div')
 		this.boardEl.classList.add('board')
 
@@ -388,8 +394,10 @@ class HTMLChessBoard
 			this.boardEl.appendChild(row)
 		}
 
+		boardBorderEl.appendChild(this.boardEl)
+
 		this.boardContainerEl.innerHTML = ''
-		this.boardContainerEl.appendChild(this.boardEl)
+		this.boardContainerEl.appendChild(boardBorderEl)
 
 		this.boardEl.addEventListener('mousedown', e =>
 		{
@@ -420,5 +428,49 @@ class HTMLChessBoard
 		{
 			this.touchUpHandler(this.wrapTouchEventToTouch(e), e)
 		})
+
+		this.boardContainerEl.insertAdjacentHTML('beforeend', /* html */ `
+		<div class="stats">
+			<div class="top">
+				<div class="eaten-pieces"></div>
+				<div class="clock"></div>
+				<div class="username"></div>
+			</div>
+
+			<div class="bottom">
+				<div class="username"></div>
+				<div class="clock"></div>
+				<div class="eaten-pieces"></div>
+			</div>
+		</div>
+		`)
+
+		this.renderStats()
+	}
+
+	renderStats()
+	{
+		const statsEl = this.boardContainerEl.querySelector('.stats')
+
+		const topEatenPiecesEl = statsEl.querySelector('.top .eaten-pieces')
+		const topClockEl = statsEl.querySelector('.top .clock')
+		const topUsernameEl = statsEl.querySelector('.top .username')
+
+		const bottomEatenPiecesEl = statsEl.querySelector('.bottom .eaten-pieces')
+		const bottomClockEl = statsEl.querySelector('.bottom .clock')
+		const bottomUsernameEl = statsEl.querySelector('.bottom .username')
+
+		const score = this.board.computeScore()
+
+		if (this.player == Colour.White)
+		{
+			topUsernameEl.innerHTML = this.blackUsername
+			bottomUsernameEl.innerHTML = this.whiteUsername
+		}
+		else
+		{
+			topUsernameEl.innerHTML = this.whiteUsername
+			bottomUsernameEl.innerHTML = this.blackUsername
+		}
 	}
 }

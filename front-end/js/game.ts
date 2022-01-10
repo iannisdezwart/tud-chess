@@ -4,6 +4,8 @@ interface GameStateData
 	board: string
 	turn: Colour
 	player: Colour
+	whiteUsername: string
+	blackUsername: string
 }
 
 interface MoveData
@@ -37,6 +39,8 @@ addEventListener('DOMContentLoaded', async () =>
 		}
 
 		board.setBoard(data.board)
+		board.whiteUsername = data.whiteUsername
+		board.blackUsername = data.blackUsername
 		board.render()
 	})
 

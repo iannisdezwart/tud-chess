@@ -6,6 +6,7 @@ interface JoinGameData
 {
 	type: 'join-game',
 	token: string
+	username: string
 }
 
 // Holds the current waiting player if there is one.
@@ -23,6 +24,11 @@ export const joinGame = (data: JoinGameData, ws: WebSocket) =>
 	{
 		sendError(ws, 'Missing "token" field.')
 		return
+	}
+
+	if (data.username == null)
+	{
+		sendError(ws, 'Missing "username" field.')
 	}
 
 	if (waitingPlayer != null)
@@ -43,15 +49,17 @@ export const joinGame = (data: JoinGameData, ws: WebSocket) =>
 
 		const player1 = {
 			ws: null, // Will be set when player 1 starts playing.
-			token: data.token
+			token: data.token,
+			username: data.username
 		}
 
 		const player2 = {
 			ws: null, // Will be set when player 2 starts playing.
-			token: waitingPlayer.token
+			token: waitingPlayer.token,
+			username: waitingPlayer.username
 		}
 
-		const game = new Game(player1, player2)
+		const game = new Game(gameID, player1, player2)
 
 		games.set(gameID, game)
 
@@ -76,5 +84,9 @@ export const joinGame = (data: JoinGameData, ws: WebSocket) =>
 	// There is no waiting player.
 	// Add the player to the waiting slot.
 
-	waitingPlayer = { ws, token: data.token }
+	waitingPlayer = {
+		ws,
+		token: data.token,
+		username: data.username
+	}
 }
