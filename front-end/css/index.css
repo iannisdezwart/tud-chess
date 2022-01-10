@@ -226,7 +226,40 @@ body
 	height: 32px;
 }
 
-.stats .end-game
+.stats .buttons
+{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 1em 0;
+}
+
+.stats button
+{
+	margin: .5em;
+	padding: .5em;
+
+	border-radius: 5px;
+	border: 1px solid transparent;
+
+	font-weight: 600;
+	background-color: #fff;
+	color: var(--accent-colour);
+
+	cursor: pointer;
+
+	transition: color 500ms ease, background-color 500ms ease,
+		border-color 500ms ease;
+}
+
+.stats #offer-draw.glow
+{
+	color: #fff;
+	background-color: var(--accent-colour);
+	border-color: #fff;
+}
+
+.stats .game-info
 {
 	text-align: center;
 	font-style: italic;

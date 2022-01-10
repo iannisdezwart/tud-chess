@@ -1,4 +1,4 @@
-BOARD_UNSELECTABLE = true
+IS_SPECTATOR = true
 
 addEventListener('DOMContentLoaded', async () =>
 {

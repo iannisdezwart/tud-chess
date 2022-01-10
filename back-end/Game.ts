@@ -25,6 +25,10 @@ export class Game
 	white: Player
 	black: Player
 
+	// Flags for offering draws.
+	whiteOffersDraw: boolean
+	blackOffersDraw: boolean
+
 	// List of WebSockets that are subscribed to this game.
 	// All moves are broadcast to all subscribers.
 	subscribers: Set<WebSocket>
@@ -58,8 +62,12 @@ export class Game
 			this.black = player1
 		}
 
+		this.whiteOffersDraw = false
+		this.blackOffersDraw = false
+
 		this.subscribers = new Set()
 		this.board = ChessBoard.generateDefault()
+
 		this.history = new Map()
 		this.fiftyMoveRule = 0
 
@@ -177,6 +185,16 @@ export class Game
 	{
 		const player = ws == this.black.ws ? Colour.Black : Colour.White
 		const clocks = this.calculateClocks()
+		let drawOffer: Colour
+
+		if (this.whiteOffersDraw)
+		{
+			drawOffer = Colour.White
+		}
+		else if (this.blackOffersDraw)
+		{
+			drawOffer = Colour.Black
+		}
 
 		send(ws, {
 			type: 'game-state',
@@ -187,7 +205,8 @@ export class Game
 				white: this.white.username,
 				black: this.black.username
 			},
-			clocks
+			clocks,
+			drawOffer
 		})
 	}
 
@@ -197,6 +216,11 @@ export class Game
 	 */
 	sendMove(from: Square, to: Square)
 	{
+		// Reset draw offers.
+
+		this.whiteOffersDraw = false
+		this.blackOffersDraw = false
+
 		// Perform the move.
 
 		const numPiecesBefore = this.board.countPieces()
@@ -302,6 +326,53 @@ export class Game
 		// The game must be a draw.
 
 		this.endGame(null, 'Draw by stalemate.')
+	}
+
+	/**
+	 * Handles draw offers from the players.
+	 */
+	offerDraw(player: Colour)
+	{
+		if (player == Colour.White)
+		{
+			// Do nothing if white already offered a draw.
+
+			if (this.whiteOffersDraw)
+			{
+				return
+			}
+
+			this.whiteOffersDraw = true
+		}
+		else
+		{
+			// Do nothing if black already offered a draw.
+
+			if (this.blackOffersDraw)
+			{
+				return
+			}
+
+			this.blackOffersDraw = true
+		}
+
+		// If both players have offered a draw, the game is a draw.
+
+		if (this.whiteOffersDraw && this.blackOffersDraw)
+		{
+			this.endGame(null, 'Draw by agreement.')
+			return
+		}
+
+		// Broadcast the offer to all subscribers.
+
+		for (const ws of this.subscribers)
+		{
+			send(ws, {
+				type: 'draw-offer',
+				player
+			})
+		}
 	}
 
 	/**

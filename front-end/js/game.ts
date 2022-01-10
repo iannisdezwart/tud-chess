@@ -12,6 +12,7 @@ interface GameStateData
 		white: number
 		black: number
 	}
+	drawOffer: Colour
 }
 
 interface MoveData
@@ -33,12 +34,18 @@ interface EndData
 	reason: string
 }
 
+interface DrawOfferData
+{
+	type: 'draw-offer'
+	player: Colour
+}
+
 // The game ID is the last part of the URL.
 
 const gameID = location.href.split('/').pop()
 
 let board: HTMLChessBoard
-let BOARD_UNSELECTABLE = false
+let IS_SPECTATOR = false
 
 addEventListener('DOMContentLoaded', async () =>
 {
@@ -50,7 +57,7 @@ addEventListener('DOMContentLoaded', async () =>
 	{
 		board = new HTMLChessBoard(boardContainerEl, data.player)
 
-		if (BOARD_UNSELECTABLE)
+		if (IS_SPECTATOR)
 		{
 			board.unselectable = true
 		}
@@ -66,6 +73,11 @@ addEventListener('DOMContentLoaded', async () =>
 
 		board.render()
 		board.update()
+
+		if (data.drawOffer != null)
+		{
+			board.handleDrawOffer(data.drawOffer)
+		}
 	})
 
 	// Receive the game state updates.
@@ -87,5 +99,10 @@ addEventListener('DOMContentLoaded', async () =>
 	receive('end', (data: EndData) =>
 	{
 		board.endGame(data.winner, data.reason)
+	})
+
+	receive('draw-offer', (data: DrawOfferData) =>
+	{
+		board.handleDrawOffer(data.player)
 	})
 })

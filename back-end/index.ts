@@ -5,7 +5,9 @@ import { send, sendError } from './util.js'
 import { getUserToken } from './ws-routes/get-user-token.js'
 import { joinGame } from './ws-routes/join-game.js'
 import { move } from './ws-routes/move.js'
+import { offerDraw } from './ws-routes/offer-draw.js'
 import { playGame } from './ws-routes/play-game.js'
+import { resign } from './ws-routes/resign.js'
 import { spectateGame } from './ws-routes/spectate-game.js'
 
 const PORT = +process.argv[2] || 3000
@@ -93,6 +95,16 @@ wsServer.on('connection', ws =>
 			{
 				spectateGame(data, ws)
 				break
+			}
+
+			case 'resign':
+			{
+				resign(data, ws)
+			}
+
+			case 'offer-draw':
+			{
+				offerDraw(data, ws)
 			}
 		}
 	})

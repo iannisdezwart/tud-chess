@@ -258,6 +258,17 @@ class HTMLChessBoard
 	 */
 	move(from: Square, to: Square)
 	{
+		// Resets any draw offers.
+
+		const gameInfoEl = document.querySelector('.game-info') as HTMLElement
+		gameInfoEl.innerText = ''
+
+		if (!IS_SPECTATOR)
+		{
+			const drawButton = document.querySelector('#offer-draw') as HTMLElement
+			drawButton.classList.remove('glow')
+		}
+
 		// Perform the move.
 
 		const changedSquares = this.board.move(from, to)
@@ -451,7 +462,14 @@ class HTMLChessBoard
 				<div class="eaten-pieces"></div>
 			</div>
 
-			<div class="end-game"></div>
+			${ !IS_SPECTATOR ? /* html */ `
+			<div class="buttons">
+				<button id="resign">Resign</button>
+				<button id="offer-draw">Offer draw</button>
+			</div>
+			` : '' }
+
+			<div class="game-info"></div>
 		</div>
 		`)
 
@@ -471,6 +489,34 @@ class HTMLChessBoard
 		{
 			topUsernameEl.innerText = this.whiteUsername
 			bottomUsernameEl.innerText = this.blackUsername
+		}
+
+		// Activate the draw offer and resign buttons.
+
+		if (!IS_SPECTATOR)
+		{
+			const buttonsEl = statsEl.querySelector('.buttons') as HTMLElement
+
+			const resignEl = buttonsEl.querySelector('#resign') as HTMLElement
+			const offerDrawEl = buttonsEl.querySelector('#offer-draw') as HTMLElement
+
+			resignEl.addEventListener('click', async () =>
+			{
+				send({
+					type: 'resign',
+					gameID,
+					token: await userToken()
+				})
+			})
+
+			offerDrawEl.addEventListener('click', async () =>
+			{
+				send({
+					type: 'offer-draw',
+					gameID,
+					token: await userToken()
+				})
+			})
 		}
 	}
 
@@ -648,6 +694,22 @@ class HTMLChessBoard
 	}
 
 	/**
+	 * Handles a draw offer.
+	 */
+	handleDrawOffer(player: Colour)
+	{
+		const playerColour = player == Colour.White ? 'White' : 'Black'
+		const gameInfoEl = document.querySelector('.game-info') as HTMLElement
+		gameInfoEl.innerText = `${ playerColour } has offered a draw.`
+
+		if (!IS_SPECTATOR)
+		{
+			const drawButton = document.querySelector('#offer-draw') as HTMLElement
+			drawButton.classList.add('glow')
+		}
+	}
+
+	/**
 	 * Handles the end of a game.
 	 */
 	endGame(winner: Colour, reason: string)
@@ -658,8 +720,8 @@ class HTMLChessBoard
 
 		// Show the reason for the end of the game.
 
-		const endGameEl = this.boardContainerEl.querySelector('.end-game') as HTMLElement
-		endGameEl.innerText = reason
+		const gameInfoEl = this.boardContainerEl.querySelector('.game-info') as HTMLElement
+		gameInfoEl.innerText = reason
 
 		// Flip the opponent's king upside down.
 

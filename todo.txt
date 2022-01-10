@@ -7,7 +7,7 @@ Todo:
 	- Make a menu.
 	- Add resign and draw buttons.
 
-Todo game end:
+Game end:
 		Positions are not the same if a pawn that could have been
 		captured en passant can no longer be captured in this manner.
 		When a king or a rook is forced to move, it will lose its
