@@ -1,0 +1,206 @@
+:root {
+    --interactiveWidth: 500px;
+    --usernameWidth: 300px;
+    --startWidth: 300px;
+}
+
+.overlay{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    background-color: rgba(0,0,0,0.5); /*for some reason changing the opacity also changes the opactiy of the message*/
+
+  }
+#warning {
+    text-align:center;
+    color: deepskyblue;
+    font-size: 500%;
+}
+
+
+
+@media (min-width: 1300px) and (min-height: 700px) {
+    .overlay {
+        display: none;
+    }
+    #warning {
+        display: none;
+    }
+
+}
+
+html, body {/*use the whole viewport*/
+    height: 100%;
+    width: 100%;
+    margin: 0%;
+    padding: 0%;
+  }
+
+body {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    grid-template-rows: 1fr;
+
+
+}
+
+aside {
+    background-color: deepskyblue;
+    height: 100%;
+    width: 350px;
+}
+
+.statsList {
+    color: white;
+    font-family: Helvetica;
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+.sideLogo, #whiteLogo {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+}
+
+.title {
+    text-align: center;
+}
+
+.title h1 {
+    font-family: Helvetica;
+    font-size: 700%;
+}
+
+.title span {
+    font-weight: bolder;
+    color: deepskyblue;
+
+}
+
+.title span::before {
+    content: "T";
+    color: black;
+}
+
+.title span::after {
+    content: "D";
+    color: black;
+}
+
+.interactive {
+    position: absolute;
+    top:250px;/*height is in px so it changes as the browser zoom in and out*/
+    left: 62.5vw; /*width is in vw so it's stationary as the browser zoom in and out*/
+    width: 500px;
+    height: 150px;
+    margin-left: -250px;
+}
+
+#username {
+    text-align: center;
+    height: 40px;
+    width: var(--usernameWidth);
+    position: absolute;
+    left: calc((var(--interactiveWidth) - var(--usernameWidth) )/2);
+}
+
+#start {
+    text-align: center;
+    width: var(--startWidth);
+    font-size: 300%;
+    font-family: Helvetica;
+    background-color: transparent;
+    border-style: none;
+
+
+    cursor: pointer;
+
+    animation-timing-function: linear;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-name: tease;
+    
+    position: absolute;
+    left: calc((var(--interactiveWidth) - var(--startWidth) )/2);
+    top: 50%;
+
+    z-index: 2;
+}
+
+#start:hover {
+    font-style: italic;
+    animation-name: none;
+}
+
+
+#start:active {
+    animation-name: none;
+    color:deepskyblue;
+    font-weight: bold;
+}
+
+
+@keyframes tease {
+    2% {
+        transform: translate(2px, 0);
+    }
+    4% {
+        transform: translate(6px, 0);
+    }
+    8% {
+        transform: translate(0, 0);
+    }
+
+    10% {
+        transform: translate(-4px, 0);
+    }
+    12% {
+        transform: translate(-8px, 0);
+    }
+    14% {
+        transform: translate(0px, 0);
+    }
+
+    100% {
+        transform: translate(0px, 0);
+    }
+}
+
+.logoAndCredit, .logoAndCredit img {
+
+text-align: center;
+
+position:absolute;
+margin-left: -250px; /* very important for the image to be centered because 
+                      it offsets the image so the reference point is around the center*/
+left:65%;
+bottom:0px;
+}
+
+.credit {
+    font-family: Helvetica;
+    font-size: 200%;
+    position: relative;
+    left:600px;
+
+
+}
+
+.creators {
+    list-style: none;
+    margin-top: 0px;
+    padding-left: 0px;
+}
+
+.creators li::before {
+    content: "\265E";
+}
