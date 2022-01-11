@@ -198,7 +198,7 @@ export class Game
 
 		send(ws, {
 			type: 'game-state',
-			board: this.board.toString(),
+			board: this.board.serialise(),
 			turn: this.board.turn,
 			player,
 			usernames: {
@@ -240,7 +240,7 @@ export class Game
 
 			if (this.fiftyMoveRule >= 100)
 			{
-				this.endGame(null, '50 move rule.')
+				this.endGame(null, 'Draw by 50 move rule.')
 				return
 			}
 		}

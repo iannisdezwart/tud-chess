@@ -1,7 +1,7 @@
 interface GameStateData
 {
 	type: 'game-state'
-	board: string
+	board: SerialisedChessBoard
 	turn: Colour
 	player: Colour
 	usernames: {

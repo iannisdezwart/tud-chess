@@ -10,6 +10,19 @@ if (typeof module != 'undefined')
 	Square = require('./Square.js')
 }
 
+interface SerialisedChessBoard
+{
+	board: string
+	whiteCastleShort: boolean
+	whiteCastleLong: boolean
+	blackCastleShort: boolean
+	blackCastleLong: boolean
+	whiteEnPassant: boolean[]
+	blackEnPassant: boolean[]
+	turn: Colour
+	turnNumber: number
+}
+
 /**
  * Class that holds all non-HTML related stuff for a chess board.
  * Holds the pieces, the current turn, and legal stuff.
@@ -18,13 +31,11 @@ class ChessBoard
 {
 	board: ChessPiece[][]
 
-	whiteKingMoved: boolean
-	whiteLeftRookMoved: boolean
-	whiteRightRookMoved: boolean
+	whiteCastleShort: boolean
+	whiteCastleLong: boolean
 
-	blackKingMoved: boolean
-	blackLeftRookMoved: boolean
-	blackRightRookMoved: boolean
+	blackCastleShort: boolean
+	blackCastleLong: boolean
 
 	whiteEnPassant: boolean[]
 	blackEnPassant: boolean[]
@@ -36,13 +47,11 @@ class ChessBoard
 	{
 		this.board = []
 
-		this.whiteKingMoved = false
-		this.whiteLeftRookMoved = false
-		this.whiteRightRookMoved = false
+		this.whiteCastleShort = true
+		this.whiteCastleLong = true
 
-		this.blackKingMoved = false
-		this.blackLeftRookMoved = false
-		this.blackRightRookMoved = false
+		this.blackCastleShort = true
+		this.blackCastleLong = true
 
 		this.whiteEnPassant = Array(8).fill(false)
 		this.blackEnPassant = Array(8).fill(false)
@@ -58,12 +67,10 @@ class ChessBoard
 	{
 		const {
 			board,
-			whiteKingMoved,
-			whiteLeftRookMoved,
-			whiteRightRookMoved,
-			blackKingMoved,
-			blackLeftRookMoved,
-			blackRightRookMoved,
+			whiteCastleShort,
+			whiteCastleLong,
+			blackCastleShort,
+			blackCastleLong,
 			whiteEnPassant,
 			blackEnPassant,
 			turn
@@ -71,29 +78,63 @@ class ChessBoard
 
 		return JSON.stringify({
 			board,
-			whiteKingMoved,
-			whiteLeftRookMoved,
-			whiteRightRookMoved,
-			blackKingMoved,
-			blackLeftRookMoved,
-			blackRightRookMoved,
+			whiteCastleShort,
+			whiteCastleLong,
+			blackCastleShort,
+			blackCastleLong,
 			whiteEnPassant,
 			blackEnPassant,
 			turn
 		})
 	}
 
-	toString()
+	serialise(): SerialisedChessBoard
 	{
-		// Todo: optimise this.
+		let boardString = ''
 
-		return JSON.stringify(this)
+		for (let y = 0; y < 8; y++)
+		{
+			for (let x = 0; x < 8; x++)
+			{
+				const piece = this.board[y][x]
+
+				if (piece == null)
+				{
+					boardString += ' '
+					continue
+				}
+
+				boardString += piece.toString()
+			}
+		}
+
+		const {
+			whiteCastleShort,
+			whiteCastleLong,
+			blackCastleShort,
+			blackCastleLong,
+			whiteEnPassant,
+			blackEnPassant,
+			turn,
+			turnNumber
+		} = this
+
+		return {
+			board: boardString,
+			whiteCastleShort,
+			whiteCastleLong,
+			blackCastleShort,
+			blackCastleLong,
+			whiteEnPassant,
+			blackEnPassant,
+			turn,
+			turnNumber
+		}
 	}
 
-	static fromString(str: string)
+	static deserialise(serialisedBoard: SerialisedChessBoard)
 	{
 		const board = new ChessBoard()
-		const data = JSON.parse(str) as ChessBoard
 
 		for (let y = 0; y < 8; y++)
 		{
@@ -101,35 +142,25 @@ class ChessBoard
 
 			for (let x = 0; x < 8; x++)
 			{
-				if (data.board[y][x] == null)
-				{
-					row.push(null)
-					continue
-				}
-
-				const type = data.board[y][x].type
-				const colour = data.board[y][x].colour
-				const piece = new ChessPiece(type, colour)
-
+				const piece = ChessPiece.fromString(
+					serialisedBoard.board[8 * y + x])
 				row.push(piece)
 			}
 
 			board.board.push(row)
 		}
 
-		board.whiteKingMoved = data.whiteKingMoved
-		board.whiteLeftRookMoved = data.whiteLeftRookMoved
-		board.whiteRightRookMoved = data.whiteRightRookMoved
+		board.whiteCastleShort = serialisedBoard.whiteCastleShort
+		board.whiteCastleLong = serialisedBoard.whiteCastleLong
 
-		board.blackKingMoved = data.blackKingMoved
-		board.blackLeftRookMoved = data.blackLeftRookMoved
-		board.blackRightRookMoved = data.blackRightRookMoved
+		board.blackCastleShort = serialisedBoard.blackCastleShort
+		board.blackCastleLong = serialisedBoard.blackCastleLong
 
-		board.whiteEnPassant = data.whiteEnPassant
-		board.blackEnPassant = data.blackEnPassant
+		board.whiteEnPassant = serialisedBoard.whiteEnPassant
+		board.blackEnPassant = serialisedBoard.blackEnPassant
 
-		board.turn = data.turn
-		board.turnNumber = data.turnNumber
+		board.turn = serialisedBoard.turn
+		board.turnNumber = serialisedBoard.turnNumber
 
 		return board
 	}
@@ -311,7 +342,6 @@ class ChessBoard
 						if (piece != null && piece.is(
 							Colour.White, ChessPieceType.King))
 						{
-							console.log(`white is in check because (${ piece.type }) ${ x } ${ y } can move to ${ move.x } ${ move.y }`)
 							return true
 						}
 					}
@@ -341,7 +371,6 @@ class ChessBoard
 						if (piece != null && piece.is(
 							Colour.Black, ChessPieceType.King))
 						{
-							console.log(`black is in check because (${ piece.type }) ${ x } ${ y } can move to ${ move.x } ${ move.y }`)
 							return true
 						}
 					}
@@ -1677,7 +1706,7 @@ class ChessBoard
 				}
 			}
 
-			if (!this.whiteKingMoved && !this.whiteRightRookMoved
+			if (!this.whiteCastleShort
 				&& this.pieceAt(x + 1, y) == null
 				&& this.pieceAt(x + 2, y) == null
 				&& checkCheck
@@ -1688,7 +1717,7 @@ class ChessBoard
 				moves.push(new Square(x + 2, y))
 			}
 
-			if (!this.whiteKingMoved && !this.whiteLeftRookMoved
+			if (!this.whiteCastleLong
 				&& this.pieceAt(x - 1, y) == null
 				&& this.pieceAt(x - 2, y) == null
 				&& this.pieceAt(x - 3, y) == null
@@ -1808,7 +1837,7 @@ class ChessBoard
 				}
 			}
 
-			if (!this.blackKingMoved && !this.blackRightRookMoved
+			if (!this.blackCastleShort
 				&& this.pieceAt(x + 1, y) == null
 				&& this.pieceAt(x + 2, y) == null
 				&& checkCheck
@@ -1819,13 +1848,15 @@ class ChessBoard
 				moves.push(new Square(x + 2, y))
 			}
 
-			if (!this.blackKingMoved && !this.blackLeftRookMoved
+			if (!this.blackCastleLong
 				&& this.pieceAt(x - 1, y) == null
 				&& this.pieceAt(x - 2, y) == null
+				&& this.pieceAt(x - 3, y) == null
 				&& checkCheck
 				&& !this.blackInCheck()
 				&& this.isLegal(x, y, x - 1, y)
-				&& this.isLegal(x, y, x - 2, y))
+				&& this.isLegal(x, y, x - 2, y)
+				&& this.isLegal(x, y, x - 3, y))
 			{
 				moves.push(new Square(x - 2, y))
 			}
@@ -1940,40 +1971,42 @@ class ChessBoard
 
 		if (movedPiece.is(Colour.White, ChessPieceType.King))
 		{
-			this.whiteKingMoved = true
+			this.whiteCastleShort = false
+			this.whiteCastleLong = false
 		}
 
-		if (!this.whiteLeftRookMoved
+		if (this.whiteCastleShort
 			&& movedPiece.is(Colour.White, ChessPieceType.Rook)
 			&& xFrom == 0 && this.pieceAt(7, 0) == null)
 		{
-			this.whiteLeftRookMoved = true
+			this.whiteCastleShort = false
 		}
 
-		if (!this.whiteRightRookMoved
+		if (this.whiteCastleLong
 			&& movedPiece.is(Colour.White, ChessPieceType.Rook)
 			&& xFrom == 7 && this.pieceAt(0, 0) == null)
 		{
-			this.whiteRightRookMoved = true
+			this.whiteCastleLong = false
 		}
 
 		if (movedPiece.is(Colour.Black, ChessPieceType.King))
 		{
-			this.blackKingMoved = true
+			this.blackCastleShort = false
+			this.blackCastleLong = false
 		}
 
-		if (!this.blackLeftRookMoved
+		if (this.blackCastleShort
 			&& movedPiece.is(Colour.Black, ChessPieceType.Rook)
 			&& xFrom == 0 && this.pieceAt(0, 7) == null)
 		{
-			this.blackLeftRookMoved = true
+			this.blackCastleShort = false
 		}
 
-		if (!this.blackRightRookMoved
+		if (this.blackCastleLong
 			&& movedPiece.is(Colour.Black, ChessPieceType.Rook)
 			&& xFrom == 7 && this.pieceAt(7, 7) == null)
 		{
-			this.blackRightRookMoved = true
+			this.blackCastleLong = false
 		}
 
 		// En passant

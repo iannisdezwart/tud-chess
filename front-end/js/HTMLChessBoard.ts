@@ -35,9 +35,9 @@ class HTMLChessBoard
 	/**
 	 * Sets the board from a string.
 	 */
-	setBoard(board: string)
+	setBoard(board: SerialisedChessBoard)
 	{
-		this.board = ChessBoard.fromString(board)
+		this.board = ChessBoard.deserialise(board)
 	}
 
 	/**
