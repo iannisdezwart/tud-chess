@@ -1706,7 +1706,7 @@ class ChessBoard
 				}
 			}
 
-			if (!this.whiteCastleShort
+			if (this.whiteCastleShort
 				&& this.pieceAt(x + 1, y) == null
 				&& this.pieceAt(x + 2, y) == null
 				&& checkCheck
@@ -1717,7 +1717,7 @@ class ChessBoard
 				moves.push(new Square(x + 2, y))
 			}
 
-			if (!this.whiteCastleLong
+			if (this.whiteCastleLong
 				&& this.pieceAt(x - 1, y) == null
 				&& this.pieceAt(x - 2, y) == null
 				&& this.pieceAt(x - 3, y) == null
@@ -1837,7 +1837,7 @@ class ChessBoard
 				}
 			}
 
-			if (!this.blackCastleShort
+			if (this.blackCastleShort
 				&& this.pieceAt(x + 1, y) == null
 				&& this.pieceAt(x + 2, y) == null
 				&& checkCheck
@@ -1848,7 +1848,7 @@ class ChessBoard
 				moves.push(new Square(x + 2, y))
 			}
 
-			if (!this.blackCastleLong
+			if (this.blackCastleLong
 				&& this.pieceAt(x - 1, y) == null
 				&& this.pieceAt(x - 2, y) == null
 				&& this.pieceAt(x - 3, y) == null

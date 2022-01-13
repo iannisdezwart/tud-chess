@@ -1,7 +1,7 @@
 import express from 'express'
 import { WebSocketServer } from 'ws'
 import { router } from './express-routes/routes.js'
-import { send, sendError } from './util.js'
+import { sendError } from './util.js'
 import { getUserToken } from './ws-routes/get-user-token.js'
 import { joinGame } from './ws-routes/join-game.js'
 import { move } from './ws-routes/move.js'
