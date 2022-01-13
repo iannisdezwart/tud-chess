@@ -47,6 +47,9 @@ export class Game
 	// Counter for the 50 move rule.
 	fiftyMoveRule: number
 
+	// Boolean for whether the game is over.
+	ended: boolean
+
 	constructor(id: string, player1: Player, player2: Player)
 	{
 		this.id = id
@@ -70,6 +73,7 @@ export class Game
 
 		this.history = new Map()
 		this.fiftyMoveRule = 0
+		this.ended = false
 
 		this.addHistory()
 		this.handleTimeoutLoss()
@@ -102,6 +106,11 @@ export class Game
 	 */
 	handleTimeoutLoss()
 	{
+		if (this.ended)
+		{
+			return
+		}
+
 		const clocks = this.calculateClocks()
 
 		// Check if one's clock has run out.
@@ -148,6 +157,7 @@ export class Game
 
 		// Remove the game from the list of games.
 
+		this.ended = true
 		this.destroy()
 	}
 
