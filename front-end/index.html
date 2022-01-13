@@ -1,40 +1,67 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 	<head>
-		<meta charset="utf-8">
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>TU Delft Chess</title>
+
+		<title>Epic Delft Chess</title>
 
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-		<link rel="stylesheet" href="/css/index.css">
+		<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+		<link href="css/index.css" rel="stylesheet">
 
 		<script src="/js/websocket.js"></script>
 		<script src="/js/user-token.js"></script>
 		<script src="/js/index.js"></script>
 	</head>
+
 	<body>
-		<input type="text" id="username">
+		<aside>
+			<ul id="stats">
+				<li>
+					Players:
+					<span id="player-count"></span>
+				</li>
+				<li>
+					Games:
+					<span id="game-count"></span>
+				</li>
+				<li>
+					Connections:
+					<span id="websocket-connection-count"></span>
+				</li>
+			</ul>
 
-		<button onclick="joinGame()">Join game</button>
-		<p class="waiting">Waiting for opponent...</p>
+			<div class="side-logo">
+				<img src="res/svg/splash/tu-delft-logo-white.svg" id="white-logo">
+			</div>
+		</aside>
 
-		<ul class="stats">
-			<li>
-				Players:
-				<span class="player-count"></span>
-			</li>
+		<main>
+			<div class="title">
+				<h1><span>U</span> Chess</h1>
+			</div>
 
-			<li>
-				Games:
-				<span class="game-count"></span>
-			</li>
+			<div class="interactive">
+				<input id="username" type="text" placeholder="Username (e.g. Andy)">
+				<button id="start" type="button" onclick="joinGame()">Join Game</button>
+				<p class="waiting">Waiting for opponent...</p>
+			</div>
 
-			<li>
-				WebSocket connections:
-				<span class="websocket-connection-count"></span>
-			</li>
-		</ul>
+			<div class="logo-and-credit">
+				<!--logo and credit need to always be next to each other, hence they are in the same div-->
+				<img src="res/svg/splash/tu-delft-logo-colour.svg">
+
+				<div class="credit">
+					Created by:
+					<ul class="creators">
+						<li>Iannis</li>
+						<li>Yijun</li>
+					</ul>
+				</div>
+			</div>
+		</main>
 	</body>
 </html>

@@ -23,9 +23,9 @@ receive('game-ready', (data: GameReadyData) =>
 
 receive('server-stats', (data: ServerStatsData) =>
 {
-	const playerCount = document.querySelector('.stats .player-count') as HTMLElement
-	const gameCount = document.querySelector('.stats .game-count') as HTMLElement
-	const webSocketCount = document.querySelector('.stats .websocket-connection-count') as HTMLElement
+	const playerCount = document.querySelector('#stats #player-count') as HTMLElement
+	const gameCount = document.querySelector('#stats #game-count') as HTMLElement
+	const webSocketCount = document.querySelector('#stats #websocket-connection-count') as HTMLElement
 
 	playerCount.innerText = data.players.toString()
 	gameCount.innerText = data.games.toString()
