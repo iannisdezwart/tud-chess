@@ -1,4 +1,5 @@
-const ws = new WebSocket(`ws://${ location.host }`)
+const scheme = location.protocol == 'https:' ? 'wss' : 'ws'
+const ws = new WebSocket(`${ scheme }://${ location.host }`)
 
 /**
  * Sends a WebSocket message to the server.
