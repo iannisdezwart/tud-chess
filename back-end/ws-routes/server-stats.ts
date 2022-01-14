@@ -1,5 +1,5 @@
 import { WebSocket } from 'ws'
-import { server, wsServer } from '../index.js'
+import { wsServer } from '../index.js'
 import { games } from '../Game.js'
 import { send } from '../util.js'
 

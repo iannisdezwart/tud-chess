@@ -15,8 +15,8 @@ const PORT = +process.argv[2] || 3000
 
 // Create the HTTP server.
 
-export const app = express()
-export const server = app.listen(PORT,
+const app = express()
+const server = app.listen(PORT,
 	() => console.log(`Server listening on port ${ PORT }`))
 
 // Include the static files in the `front-end` directory.
