@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>Epic Delft Chess</title>
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+		<link href="../css/splash.css" rel="stylesheet">
+
+		<script src="../js/splash.js"></script>
+	</head>
+
+	<body>
+		<aside>
+			<ul id="stats">
+				<li>
+					Players:
+					<span id="players"><%=players%></span>
+				</li>
+				<li>
+					Games:
+					<span id="games"><%=games%></span>
+				</li>
+				<li>
+					Connections:
+					<span id="webSocketConnections"><%=webSocketConnections%></span>
+				</li>
+				
+				<li id="alert">
+                    Alert: Desktop resolution is recommanded
+                </li>
+
+			</ul>
+
+			<div class="side-logo">
+				<img src="res/svg/splash/tu-delft-logo-white.svg" id="white-logo">
+			</div>
+		</aside>
+
+		<main>
+			<div class="title">
+				<h1>T<span class="blue">U</span>D <span class="thin">Chess</span></h1>
+			</div>
+
+			<div class="interactive">
+				<input id="username" type="text" placeholder="Username (e.g. Andy)" autocomplete="off" value="Anonymous">
+				<button id="start" type="button">Join Game</button><!--don't add onclick or else the method will be executed twice-->
+				<p class="waiting">Waiting for opponent...</p>
+			</div>
+
+			<div class="logo-and-credit">
+				<!--logo and credit need to always be next to each other, hence they are in the same div-->
+				<img src="res/svg/splash/tu-delft-logo-colour.svg">
+
+				<div class="credit">
+					Created by:
+					<ul class="creators">
+						<li>Iannis</li>
+						<li>Yijun</li>
+					</ul>
+				</div>
+			</div>
+		</main>
+	</body>
+</html>
