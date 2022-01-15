@@ -27,6 +27,16 @@ class Square
 
 		return this.x == other.x && this.y == other.y
 	}
+
+	toString()
+	{
+		return `${ String.fromCharCode('a'.charCodeAt(0) + this.x) }${ this.y + 1 }`
+	}
+
+	static deserialise(square: Square)
+	{
+		return new Square(square.x, square.y)
+	}
 }
 
 if (typeof module != 'undefined')

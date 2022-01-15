@@ -90,7 +90,28 @@ export const move = (data: MoveData, ws: WebSocket) =>
 
 	// Make the move and broadcast it to all subscribers.
 
-	const promotion = data.promotion ?? ChessPieceType.Queen
+	const promotion = data.promotion
 
-	game.sendMove(from, to, promotion)
+	try
+	{
+		game.sendMove(from, to, async () =>
+		{
+			// Ensure the player provided a valid promotion piece.
+
+			if (promotion == null)
+			{
+				sendError(ws, 'Missing "promotion" field.')
+				throw new Error('missing promotion')
+			}
+
+			return promotion
+		})
+	}
+	catch
+	{
+		// This only happens if the move required a promotion, but
+		// the client didn't provide one.
+		// We don't need to do anything, since everything is already
+		// handled in the `Game.sendMove()` function.
+	}
 }

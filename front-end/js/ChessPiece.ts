@@ -304,6 +304,11 @@ class ChessPiece
 			}
 		}
 	}
+
+	static deserialise(chessPiece: ChessPiece)
+	{
+		return new ChessPiece(chessPiece.type, chessPiece.colour)
+	}
 }
 
 if (typeof module != 'undefined')

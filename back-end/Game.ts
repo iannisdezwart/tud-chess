@@ -39,6 +39,9 @@ export class Game
 	// The time of the last move.
 	lastMoveTime: number
 
+	// An array of all the moves that have occured in this game.
+	moves: Move[]
+
 	// A map of hashes of all board positions that have occurred.
 	// The number of times this position has occurred is stored.
 	// This is used to check threefold repetition.
@@ -70,6 +73,7 @@ export class Game
 
 		this.subscribers = new Set()
 		this.board = ChessBoard.generateDefault()
+		this.moves = []
 
 		this.history = new Map()
 		this.fiftyMoveRule = 0
@@ -209,6 +213,7 @@ export class Game
 		send(ws, {
 			type: 'game-state',
 			board: this.board.serialise(),
+			moves: this.moves,
 			turn: this.board.turn,
 			player,
 			usernames: {
@@ -221,11 +226,14 @@ export class Game
 	}
 
 	/**
-	 * Sends a move to all subscribers and updates the clock for
-	 * the player who made the move.
+	 * Sends a move to all subscribers, updates the clock for
+	 * the player who made the move, and adds the move to the moves array.
 	 */
-	async sendMove(from: Square, to: Square, promotion: ChessPieceType)
+	async sendMove(from: Square, to: Square, promotionCb: () => Promise<ChessPieceType>)
 	{
+		const movedPiece = this.board.pieceAt(from.x, from.y)
+		let promotion: ChessPieceType
+
 		// Reset draw offers.
 
 		this.whiteOffersDraw = false
@@ -235,12 +243,21 @@ export class Game
 
 		const numPiecesBefore = this.board.countPieces()
 		const changedSquares = await this.board.move(from, to,
-			() => Promise.resolve(promotion))
+			async () =>
+			{
+				promotion = await promotionCb()
+				return promotion
+			})
+
 		const numPiecesAfter = this.board.countPieces()
 		const pawnMove = changedSquares.find(sq =>
 			this.board.pieceAt(sq.x, sq.y) != null
 			&& this.board.pieceAt(sq.x, sq.y).type
 				== ChessPieceType.Pawn) != null
+
+		// Save the move.
+
+		this.moves.push({ from, to, promotion, movedPiece })
 
 		// Keep track of 50 move rule.
 

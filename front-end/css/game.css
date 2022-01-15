@@ -36,6 +36,16 @@ body
 	justify-content: center;
 }
 
+.board-and-moves-container
+{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
+	margin: 2em 0;
+}
+
 @media (max-width: 800px)
 {
 	.chess-board-container
@@ -65,9 +75,49 @@ body
 	}
 }
 
+.past-moves
+{
+	display: flex;
+	padding: 0;
+	max-width: calc(var(--square-size) * 8);
+
+	list-style-type: none;
+
+	overflow-x: auto;
+	scroll-behavior: smooth;
+}
+
+.past-moves::-webkit-scrollbar
+{
+	height: 6px;
+}
+
+.past-moves::-webkit-scrollbar-track
+{
+	background-color: #f7f7f7;
+	border-radius: 3px;
+}
+
+.past-moves::-webkit-scrollbar-thumb
+{
+	background-color: #e7e7e7;
+	border-radius: 3px;
+}
+
+.past-moves li
+{
+	flex-shrink: 0;
+	margin: .5em;
+}
+
+.past-moves img
+{
+	width: 1.5em;
+	height: 1.5em;
+}
+
 .board-border
 {
-	margin: 2em 0;
 	border: calc(var(--square-size) * var(--board-border-size)) solid var(--light-accent-colour);
 	border-radius: 5px;
 }
@@ -268,6 +318,20 @@ body
 {
 	text-align: center;
 	font-style: italic;
+}
+
+@media (max-width: 600px)
+{
+	.stats
+	{
+		padding: 1em;
+		margin: 1em;
+	}
+
+	.stats .clock
+	{
+		font-size: 1.5em;
+	}
 }
 
 .promotion

@@ -1,7 +1,16 @@
+interface Move
+{
+	from: Square
+	to: Square
+	promotion: ChessPieceType
+	movedPiece: ChessPiece
+}
+
 interface GameStateData
 {
 	type: 'game-state'
 	board: SerialisedChessBoard
+	moves: Move[]
 	turn: Colour
 	player: Colour
 	usernames: {
@@ -64,6 +73,7 @@ addEventListener('DOMContentLoaded', async () =>
 		}
 
 		board.setBoard(data.board)
+		board.moves = data.moves
 
 		board.whiteUsername = data.usernames.white
 		board.blackUsername = data.usernames.black

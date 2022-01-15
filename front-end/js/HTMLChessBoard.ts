@@ -5,6 +5,8 @@
 class HTMLChessBoard
 {
 	board: ChessBoard
+	moves: Move[]
+
 	boardEl: HTMLElement
 	boardContainerEl: HTMLElement
 
@@ -261,6 +263,40 @@ class HTMLChessBoard
 	}
 
 	/**
+	 * Adds a move to the past moves list.
+	 */
+	addMoveListItem(move: Move)
+	{
+		const listEl = document.querySelector<HTMLUListElement>('.past-moves')
+		const numMoves = listEl.children.length
+
+		// Add the move number if this is White's move.
+
+		const isWhiteMove = numMoves % 2 == 0
+		const player = isWhiteMove ? Colour.White : Colour.Black
+		const moveNumber = isWhiteMove
+			? /* html */ `<span class="move-number">${ numMoves / 2 + 1 }.</span>`
+			: ''
+
+		const promotion = move.promotion != null
+			? new ChessPiece(move.promotion, player).svg()
+			: ''
+
+		listEl.insertAdjacentHTML('beforeend', /* html */ `
+		<li>
+			${ moveNumber }
+			${ move.movedPiece.svg() }
+			${ Square.deserialise(move.to).toString() }
+			${ promotion }
+		</li>
+		`)
+
+		// Scroll the list to the end.
+
+		listEl.scrollLeft = listEl.scrollWidth
+	}
+
+	/**
 	 * Performs a move.
 	 */
 	async performMove(fromSquare: Square, toSquare: Square)
@@ -358,8 +394,10 @@ class HTMLChessBoard
 	/**
 	 * Performs a move on the board.
 	 */
-	async move(from: Square, to: Square, promotion: () => Promise<ChessPieceType>)
+	async move(from: Square, to: Square, promotionCb: () => Promise<ChessPieceType>)
 	{
+		const movedPiece = this.board.pieceAt(from.x, from.y)
+
 		// Resets any draw offers.
 
 		const gameInfoEl = document.querySelector('.game-info') as HTMLElement
@@ -373,7 +411,20 @@ class HTMLChessBoard
 
 		// Perform the move.
 
-		const changedSquares = await this.board.move(from, to, promotion)
+		let promotion: ChessPieceType
+
+		const changedSquares = await this.board.move(from, to,
+			async () =>
+			{
+				promotion = await promotionCb()
+				return promotion
+			})
+
+		// Add the move to the move list.
+
+		const move = { from, to, promotion, movedPiece }
+
+		this.addMoveListItem(move)
 
 		// Update the board.
 
@@ -458,8 +509,14 @@ class HTMLChessBoard
 	 */
 	render()
 	{
+		// Create the board and put the pieces on the their squares.
+
+		const boardAndMovesContainer = document.createElement('div')
+		boardAndMovesContainer.classList.add('board-and-moves-container')
+
 		const boardBorderEl = document.createElement('div')
 		boardBorderEl.classList.add('board-border')
+		boardAndMovesContainer.appendChild(boardBorderEl)
 
 		this.boardEl = document.createElement('div')
 		this.boardEl.classList.add('board')
@@ -526,8 +583,28 @@ class HTMLChessBoard
 
 		boardBorderEl.appendChild(this.boardEl)
 
-		this.boardContainerEl.innerHTML = ''
-		this.boardContainerEl.appendChild(boardBorderEl)
+		// Add the board to the DOM.
+
+		this.boardContainerEl.appendChild(boardAndMovesContainer)
+
+		// Create the past moves list.
+
+		boardAndMovesContainer.insertAdjacentHTML('afterbegin', /* html */ `
+		<ul class="past-moves"></ul>
+		`)
+
+		for (const move of this.moves)
+		{
+			this.addMoveListItem({
+				from: move.from,
+				to: move.to,
+				promotion: move.promotion,
+				movedPiece: ChessPiece.deserialise(move.movedPiece)
+			})
+		}
+
+		// Register mouse and touch event listeners for selecting
+		// and dragging the pieces.
 
 		this.boardEl.addEventListener('mousedown', e =>
 		{
@@ -558,6 +635,8 @@ class HTMLChessBoard
 		{
 			this.touchUpHandler(this.wrapTouchEventToTouch(e), e)
 		})
+
+		// Add the stats panel to the DOM.
 
 		this.boardContainerEl.insertAdjacentHTML('beforeend', /* html */ `
 		<div class="stats">
