@@ -3,6 +3,7 @@ import { send } from './util.js'
 import { createHash } from 'crypto'
 // @ts-ignore
 import _ChessBoard from '../front-end/js/ChessBoard.js'
+import { addToDatabase } from './database.js'
 const ChessBoard = _ChessBoard as ChessBoardClass
 
 export interface Player
@@ -53,6 +54,9 @@ export class Game
 	// Boolean for whether the game is over.
 	ended: boolean
 
+	// The start time of the game.
+	startTime: number
+
 	constructor(id: string, player1: Player, player2: Player)
 	{
 		this.id = id
@@ -78,6 +82,7 @@ export class Game
 		this.history = new Map()
 		this.fiftyMoveRule = 0
 		this.ended = false
+		this.startTime = Date.now()
 
 		this.addHistory()
 		this.handleTimeoutLoss()
@@ -144,6 +149,7 @@ export class Game
 
 	/**
 	 * Ends the game and broadcasts the winner to all subscribers.
+	 * The game will be saved to the database.
 	 * @param winner The colour of the winner. If null, the game is a draw.
 	 */
 	endGame(winner: Colour, reason: string)
@@ -159,10 +165,29 @@ export class Game
 			})
 		}
 
+		// Save the game to the database.
+
+		this.saveToDatabase(winner)
+
 		// Remove the game from the list of games.
 
 		this.ended = true
 		this.destroy()
+	}
+
+	/**
+	 * Saves the game to the database.
+	 */
+	saveToDatabase(winner: Colour)
+	{
+		addToDatabase({
+			id: this.id,
+			whiteUsername: this.white.username,
+			blackUsername: this.black.username,
+			moves: this.moves,
+			dateTime: this.startTime,
+			winner
+		})
 	}
 
 	/**

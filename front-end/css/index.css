@@ -133,7 +133,7 @@ main
 #username
 {
 	text-align: center;
-	margin: 1em;
+	margin: 1em 0;
 	padding: .5em;
 
 	font-size: 48px;
@@ -273,14 +273,14 @@ main
 	}
 }
 
-.logo-and-credit
+#past-games
 {
-	margin-top: 20px;
-	display: flex;
-	text-align: center;
+	margin: 1em 0;
+	color: #00bfff;
+	font-style: italic;
 }
 
-.logo-and-credit img
+#logo
 {
 	width: 600px;
 }
@@ -291,12 +291,12 @@ main
 	flex-direction: column;
 	justify-content: flex-end;
 	font-size: 2em;
-	margin-left: 1em;
+	text-align: center;
 }
 
 @media (max-width: 1400px)
 {
-	.logo-and-credit img
+	#logo
 	{
 		width: 500px;
 	}
@@ -309,7 +309,7 @@ main
 
 @media (max-width: 1100px)
 {
-	.logo-and-credit img
+	#logo
 	{
 		width: 350px;
 	}
@@ -394,12 +394,7 @@ main
 
 @media (max-width: 600px)
 {
-	.logo-and-credit
-	{
-		flex-direction: column;
-	}
-
-	.logo-and-credit img
+	#logo
 	{
 		width: 250px;
 	}

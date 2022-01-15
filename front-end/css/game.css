@@ -19,14 +19,22 @@ body
 	align-items: center;
 }
 
-.waiting
+#navbar
 {
-	display: none;
+	background-color: #00bfff;
+
+	width: 100vw;
+	margin-bottom: 1em;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
-.visible
+#navbar-logo
 {
-	display: unset;
+	height: 4em;
+	margin: 1em 0;
 }
 
 .chess-board-container
@@ -44,6 +52,17 @@ body
 	justify-content: center;
 
 	margin: 2em 0;
+}
+
+.arrows
+{
+	margin-top: 1em;
+}
+
+.arrow
+{
+	margin: 0 .5em;
+	width: 3em;
 }
 
 @media (max-width: 800px)

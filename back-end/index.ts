@@ -2,6 +2,7 @@ import express from 'express'
 import { WebSocketServer } from 'ws'
 import { router } from './express-routes/routes.js'
 import { sendError } from './util.js'
+import { analyseGame } from './ws-routes/analyse-game.js'
 import { getUserToken } from './ws-routes/get-user-token.js'
 import { joinGame } from './ws-routes/join-game.js'
 import { move } from './ws-routes/move.js'
@@ -18,6 +19,10 @@ const PORT = +process.argv[2] || 3000
 const app = express()
 const server = app.listen(PORT,
 	() => console.log(`Server listening on port ${ PORT }`))
+
+// Use EJS as the view engine.
+
+app.set('view engine', 'ejs')
 
 // Include the static files in the `front-end` directory.
 
@@ -112,6 +117,11 @@ wsServer.on('connection', ws =>
 			case 'get-server-stats':
 			{
 				serverStats(ws)
+			}
+
+			case 'analyse-game':
+			{
+				analyseGame(data, ws)
 			}
 		}
 	})

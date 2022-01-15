@@ -1,8 +1,8 @@
 import express from 'express';
 import { WebSocketServer } from 'ws';
 import { router } from './express-routes/routes.js';
-import { games } from './Game.js';
 import { sendError } from './util.js';
+import { analyseGame } from './ws-routes/analyse-game.js';
 import { getUserToken } from './ws-routes/get-user-token.js';
 import { joinGame } from './ws-routes/join-game.js';
 import { move } from './ws-routes/move.js';
@@ -11,30 +11,19 @@ import { playGame } from './ws-routes/play-game.js';
 import { resign } from './ws-routes/resign.js';
 import { serverStats } from './ws-routes/server-stats.js';
 import { spectateGame } from './ws-routes/spectate-game.js';
-
-
-
-const PORT = process.argv[2] || 3000;
+const PORT = +process.argv[2] || 3000;
 // Create the HTTP server.
-export const app = express();
-export const server = app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+const app = express();
+const server = app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+// Use EJS as the view engine.
+app.set('view engine', 'ejs');
 // Include the static files in the `front-end` directory.
 app.use(express.static('../front-end'));
-
-
-app.set("views", "../front-end/views");
-app.set('view engine', 'ejs');
-
-
 // Register routes to the express app.
 app.use(router);
 // Start the WebSocket server at the same port as the HTTP server.
 export const wsServer = new WebSocketServer({ server });
 // Handle new WebSocket connections.
-
-
-
-
 wsServer.on('connection', ws => {
     // Handle incoming messages on this new WebSocket.
     ws.on('message', message => {
@@ -93,11 +82,10 @@ wsServer.on('connection', ws => {
                 {
                     serverStats(ws);
                 }
+            case 'analyse-game':
+                {
+                    analyseGame(data, ws);
+                }
         }
     });
 });
-app.get('/', function(req, res) {
-    res.render('splash', {
-        players: games.size *2, games: games.size, webSocketConnections: wsServer.clients.size
-    });
-    })

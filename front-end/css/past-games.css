@@ -1,0 +1,79 @@
+body
+{
+	font-family: 'Open Sans', sans-serif;
+
+	margin: 0;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+#navbar
+{
+	background-color: #00bfff;
+
+	width: 100vw;
+	margin-bottom: 1em;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#navbar-logo
+{
+	height: 4em;
+	margin: 1em 0;
+}
+
+#past-games
+{
+	list-style-type: none;
+}
+
+#past-games li
+{
+	border-left: 6px solid #00bfff;
+	padding: 1em;
+	padding-left: 2em;
+	margin: 2em 0;
+}
+
+.entry-id,
+.entry-date
+{
+	color: #777;
+}
+
+.entry-players
+{
+	margin-top: 1em;
+}
+
+.username
+{
+	font-weight: 700;
+	font-style: italic;
+}
+
+.winner
+{
+	color: #00bfff;
+	font-weight: 700;
+}
+
+a.analyse
+{
+	display: inline-block;
+
+	color: #00bfff;
+	text-decoration: none;
+
+	margin: .5em 0;
+
+	font-weight: 700;
+	font-style: italic;
+	font-size: 1.5em;
+}

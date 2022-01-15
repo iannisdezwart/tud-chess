@@ -17,6 +17,7 @@ class HTMLChessBoard
 	clickedPieceSquare: Square
 
 	unselectable = false
+	analysisMode = false
 
 	whiteUsername: string
 	blackUsername: string
@@ -585,6 +586,7 @@ class HTMLChessBoard
 
 		// Add the board to the DOM.
 
+		this.boardContainerEl.innerHTML = ''
 		this.boardContainerEl.appendChild(boardAndMovesContainer)
 
 		// Create the past moves list.
@@ -592,6 +594,18 @@ class HTMLChessBoard
 		boardAndMovesContainer.insertAdjacentHTML('afterbegin', /* html */ `
 		<ul class="past-moves"></ul>
 		`)
+
+		// Add arrows if we're in analysis mode.
+
+		if (this.analysisMode)
+		{
+			boardAndMovesContainer.insertAdjacentHTML('beforeend', /* html */ `
+			<div class="arrows">
+				<img class="arrow left" src="/res/svg/arrows/left.svg">
+				<img class="arrow right" src="/res/svg/arrows/right.svg">
+			</div>
+			`)
+		}
 
 		for (const move of this.moves)
 		{
@@ -643,11 +657,15 @@ class HTMLChessBoard
 			<div class="top">
 				<div class="eaten-pieces"></div>
 				<div class="username"></div>
+				${ this.analysisMode ? '' : /* html */ `
 				<div class="clock"></div>
+				` }
 			</div>
 
 			<div class="bottom">
+				${ this.analysisMode ? '' : /* html */ `
 				<div class="clock"></div>
+				` }
 				<div class="username"></div>
 				<div class="eaten-pieces"></div>
 			</div>
@@ -879,7 +897,11 @@ class HTMLChessBoard
 	 */
 	update()
 	{
-		this.updateClocks()
+		if (!this.analysisMode)
+		{
+			this.updateClocks()
+		}
+
 		this.updateScore()
 	}
 
