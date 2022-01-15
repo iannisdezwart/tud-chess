@@ -107,21 +107,25 @@ wsServer.on('connection', ws =>
 			case 'resign':
 			{
 				resign(data, ws)
+				break
 			}
 
 			case 'offer-draw':
 			{
 				offerDraw(data, ws)
+				break
 			}
 
 			case 'get-server-stats':
 			{
 				serverStats(ws)
+				break
 			}
 
 			case 'analyse-game':
 			{
 				analyseGame(data, ws)
+				break
 			}
 		}
 	})
