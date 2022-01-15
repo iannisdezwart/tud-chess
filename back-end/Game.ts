@@ -271,6 +271,10 @@ export class Game
 				return
 			}
 		}
+		else
+		{
+			this.fiftyMoveRule = 0
+		}
 
 		// Update remaining time on the clock.
 		// The players are swapped because the move was already made.

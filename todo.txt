@@ -2,11 +2,6 @@ Maybe:
 	- Add the possibility of drawing arrows.
 	- Animate moves.
 
-Todo:
-	- Make splash screen.
-	- Make a menu.
-	- Add resign and draw buttons.
-
 Game end:
 		Positions are not the same if a pawn that could have been
 		captured en passant can no longer be captured in this manner.
