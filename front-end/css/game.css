@@ -23,7 +23,7 @@ body
 {
 	background-color: #00bfff;
 
-	width: 100vw;
+	width: 100%;
 	margin-bottom: 1em;
 
 	display: flex;
@@ -308,7 +308,8 @@ body
 	margin: 1em 0;
 }
 
-.stats button
+.stats button,
+#analyse-button
 {
 	margin: .5em;
 	padding: .5em;

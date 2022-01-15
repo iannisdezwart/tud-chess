@@ -965,5 +965,13 @@ class HTMLChessBoard
 				}
 			}
 		}
+
+		// Show a button to analyse the game.
+
+		const buttons = document.querySelector('.buttons')
+
+		buttons.insertAdjacentHTML('beforeend', /* html */ `
+		<button onclick="location.href = '/analyse/${ gameID }'">Analyse</a>
+		`)
 	}
 }
