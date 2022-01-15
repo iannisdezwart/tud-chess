@@ -210,7 +210,7 @@ class HTMLChessBoard
 		// Update the position of the dragged piece.
 
 		const { clientX, clientY } = touch
-		const img = this.clickedPiece.querySelector<HTMLImageElement>('img')
+		const img = this.clickedPiece.querySelector('img')
 		const rect = this.clickedPiece.getBoundingClientRect()
 
 		const middleX = rect.x + rect.width / 2
@@ -253,7 +253,7 @@ class HTMLChessBoard
 
 		// Undo the visual translations on the piece.
 
-		const img = this.clickedPiece.querySelector<HTMLImageElement>('img')
+		const img = this.clickedPiece.querySelector('img')
 
 		img.style.transform = null
 		img.style.zIndex = null
@@ -288,7 +288,7 @@ class HTMLChessBoard
 	 */
 	addMoveListItem(move)
 	{
-		const listEl = document.querySelector<HTMLUListElement>('.past-moves')
+		const listEl = document.querySelector('.past-moves')
 		const numMoves = listEl.children.length
 
 		// Add the move number if this is White's move.
