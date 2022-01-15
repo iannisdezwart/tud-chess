@@ -1,27 +1,19 @@
-import { WebSocket } from 'ws'
-import { Game, games, Player } from '../Game.js'
+import { Game, games } from '../Game.js'
 import { randomID, send, sendError } from '../util.js'
-
-interface JoinGameData
-{
-	type: 'join-game',
-	token: string
-	username: string
-}
 
 // Holds the current waiting player if there is one.
 // This player will be added to a game when another player joins.
-let waitingPlayer: Player
+let waitingPlayer
 
 // One minute in milliseconds.
 const MINUTE = 60 * 1000
 
 /**
  * Matches a player with a waiting player.
- * @param { JoinGameData } data The data sent by the client.
- * @param { WebSocket } ws The client's WebSocket.
+ * @param data The data sent by the client.
+ * @param ws The client's WebSocket.
  */
-export const joinGame = (data: JoinGameData, ws: WebSocket) =>
+export const joinGame = (data, ws) =>
 {
 	if (data.token == null)
 	{

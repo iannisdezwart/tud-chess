@@ -1,18 +1,10 @@
-import WebSocket from 'ws'
 import { games } from '../Game.js'
 import { sendError } from '../util.js'
-
-interface ResignData
-{
-	type: 'resign'
-	gameID: string
-	token: string
-}
 
 /**
  * Resigns a player from a game.
  */
-export const resign = (data: ResignData, ws: WebSocket) =>
+export const resign = (data, ws) =>
 {
 	// Handle missing fields.
 

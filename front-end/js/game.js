@@ -1,69 +1,17 @@
-interface Move
-{
-	from: Square
-	to: Square
-	promotion: ChessPieceType
-	movedPiece: ChessPiece
-}
-
-interface GameStateData
-{
-	type: 'game-state'
-	board: SerialisedChessBoard
-	moves: Move[]
-	turn: Colour
-	player: Colour
-	usernames: {
-		white: string
-		black: string
-	}
-	clocks: {
-		white: number
-		black: number
-	}
-	drawOffer: Colour
-}
-
-interface MoveData
-{
-	type: 'move'
-	from: Square
-	to: Square
-	turnNumber: number
-	clocks: {
-		white: number
-		black: number
-	}
-	promotion: ChessPieceType
-}
-
-interface EndData
-{
-	type: 'end'
-	winner: Colour
-	reason: string
-}
-
-interface DrawOfferData
-{
-	type: 'draw-offer'
-	player: Colour
-}
-
 // The game ID is the last part of the URL.
 
 const gameID = location.href.split('/').pop()
 
-let board: HTMLChessBoard
+let board
 let IS_SPECTATOR = false
 
 addEventListener('DOMContentLoaded', async () =>
 {
-	const boardContainerEl = document.querySelector('.chess-board-container') as HTMLElement
+	const boardContainerEl = document.querySelector('.chess-board-container')
 
 	// Receive the game state.
 
-	receive('game-state', (data: GameStateData) =>
+	receive('game-state', data =>
 	{
 		board = new HTMLChessBoard(boardContainerEl, data.player)
 
@@ -93,7 +41,7 @@ addEventListener('DOMContentLoaded', async () =>
 
 	// Receive the game state updates.
 
-	receive('move', (data: MoveData) =>
+	receive('move', data =>
 	{
 		if (board.board.turnNumber != data.turnNumber)
 		{
@@ -108,12 +56,12 @@ addEventListener('DOMContentLoaded', async () =>
 		board.update()
 	})
 
-	receive('end', (data: EndData) =>
+	receive('end', data =>
 	{
 		board.endGame(data.winner, data.reason)
 	})
 
-	receive('draw-offer', (data: DrawOfferData) =>
+	receive('draw-offer', data =>
 	{
 		board.handleDrawOffer(data.player)
 	})

@@ -1,20 +1,13 @@
-import { WebSocket } from 'ws'
 import { readDatabase } from '../database.js'
 import { send, sendError } from '../util.js'
-
-interface AnalyseGameData
-{
-	type: 'analyse-game'
-	gameID: string
-}
 
 /**
  * Handles a client's request to analyse a game.
  * The client will be sent the game.
- * @param { AnalyseGameData } data The client's request.
- * @param { WebSocket } ws The client's WebSocket.
+ * @param data The client's request.
+ * @param ws The client's WebSocket.
  */
-export const analyseGame = async (data: AnalyseGameData, ws: WebSocket) =>
+export const analyseGame = async (data, ws) =>
 {
 	// Handle missing fields.
 

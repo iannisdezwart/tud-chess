@@ -4,7 +4,7 @@ const ws = new WebSocket(`${ scheme }://${ location.host }`)
 /**
  * Sends a WebSocket message to the server.
  */
-const send = (data: any) =>
+const send = (data) =>
 {
 	if (ws.readyState == WebSocket.OPEN)
 	{
@@ -21,11 +21,11 @@ const send = (data: any) =>
 /**
  * Adds a listener to the WebSocket for a specific message type.
  */
-const receive = (type: string, callback: (data: any) => void) =>
+const receive = (type, callback) =>
 {
 	ws.addEventListener('message', message =>
 	{
-		let data: any
+		let data
 
 		try
 		{

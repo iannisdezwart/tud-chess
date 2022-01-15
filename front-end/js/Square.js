@@ -4,10 +4,11 @@
  */
 class Square
 {
-	x: number
-	y: number
+	// The coordinates of the square.
+	x
+	y
 
-	constructor(x: number, y: number)
+	constructor(x, y)
 	{
 		this.x = x
 		this.y = y
@@ -24,7 +25,7 @@ class Square
 	/**
 	 * Checks if the square is equal to another square.
 	 */
-	equals(other: Square)
+	equals(other)
 	{
 		if (other == null)
 		{
@@ -45,7 +46,7 @@ class Square
 	/**
 	 * Deserialises a square from a WebSocket.
 	 */
-	static deserialise(square: Square)
+	static deserialise(square)
 	{
 		return new Square(square.x, square.y)
 	}

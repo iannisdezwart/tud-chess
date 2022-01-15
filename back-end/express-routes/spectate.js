@@ -1,10 +1,9 @@
-import { Request, Response } from 'express'
 import { games } from '../Game.js'
 
 /**
  * Route that displays a specific game as a spectator.
  */
-export const spectateRoute = (req: Request, res: Response) =>
+export const spectateRoute = (req, res) =>
 {
 	// Get the game ID from the URL.
 

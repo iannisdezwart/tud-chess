@@ -1,20 +1,12 @@
-import { WebSocket } from 'ws'
 import { games } from '../Game.js'
 import { sendError } from '../util.js'
 
-interface PlayGameData
-{
-	type: 'play-game'
-	gameID: string
-	token: string
-}
-
 /**
  * Handles a client's request to start playing a game.
- * @param { PlayGameData } data The client's request.
- * @param { WebSocket } ws The client's WebSocket.
+ * @param data The client's request.
+ * @param ws The client's WebSocket.
  */
-export const playGame = (data: PlayGameData, ws: WebSocket) =>
+export const playGame = (data, ws) =>
 {
 	// Handle missing fields.
 

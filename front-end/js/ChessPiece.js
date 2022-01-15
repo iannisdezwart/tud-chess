@@ -1,17 +1,15 @@
-enum ChessPieceType
-{
-	King,
-	Queen,
-	Rook,
-	Bishop,
-	Knight,
-	Pawn
+const ChessPieceType = {
+	King: 0,
+	Queen: 1,
+	Rook: 2,
+	Bishop: 3,
+	Knight: 4,
+	Pawn: 5
 }
 
-enum Colour
-{
-	White,
-	Black
+const Colour = {
+	White: 0,
+	Black: 1
 }
 
 /**
@@ -19,10 +17,13 @@ enum Colour
  */
 class ChessPiece
 {
-	type: ChessPieceType
-	colour: Colour
+	// The type of the piece.
+	type
 
-	constructor(type: ChessPieceType, colour: Colour)
+	// The colour of the piece.
+	colour
+
+	constructor(type, colour)
 	{
 		this.type = type
 		this.colour = colour
@@ -106,7 +107,7 @@ class ChessPiece
 	/**
 	 * Reads a one-letter code for the piece.
 	 */
-	static fromString(str: string)
+	static fromString(str)
 	{
 		switch (str)
 		{
@@ -177,7 +178,7 @@ class ChessPiece
 	/**
 	 * Shortcut to check if the piece is a particular piece.
 	 */
-	is(colour: Colour, type: ChessPieceType)
+	is(colour, type)
 	{
 		return this.colour == colour && this.type == type
 	}
@@ -325,7 +326,7 @@ class ChessPiece
 	/**
 	 * Deserialises a piece from a WebSocket.
 	 */
-	static deserialise(chessPiece: ChessPiece)
+	static deserialise(chessPiece)
 	{
 		return new ChessPiece(chessPiece.type, chessPiece.colour)
 	}

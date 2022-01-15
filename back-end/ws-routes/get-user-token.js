@@ -1,4 +1,3 @@
-import WebSocket from 'ws'
 import { randomID, send } from '../util.js'
 
 /**
@@ -6,9 +5,9 @@ import { randomID, send } from '../util.js'
  * This token can be used to identify the user.
  * The client must send this token back to the server when it wants
  * to join or play a game.
- * @param { WebSocket } ws The client's WebSocket.
+ * @param ws The client's WebSocket.
  */
-export const getUserToken = (ws: WebSocket) =>
+export const getUserToken = ws =>
 {
 	const id = randomID(64)
 

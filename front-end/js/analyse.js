@@ -1,22 +1,9 @@
-interface GameData
-{
-	type: 'game'
-	game: {
-		id: string
-		whiteUsername: string
-		blackUsername: string
-		moves: Move[]
-		dateTime: number
-		winner: Colour
-	}
-}
-
 IS_SPECTATOR = true
 
 addEventListener('DOMContentLoaded', async () =>
 {
 	const gameID = location.href.split('/').pop()
-	const boardContainerEl = document.querySelector('.chess-board-container') as HTMLElement
+	const boardContainerEl = document.querySelector('.chess-board-container')
 
 	// Analyse the game.
 
@@ -24,7 +11,7 @@ addEventListener('DOMContentLoaded', async () =>
 
 	// Receive the game.
 
-	receive('game', (data: GameData) =>
+	receive('game', data =>
 	{
 		board = new HTMLChessBoard(boardContainerEl, Colour.White)
 
@@ -41,7 +28,7 @@ addEventListener('DOMContentLoaded', async () =>
 
 		// Keep a history of board states.
 
-		const history: { board: SerialisedChessBoard, moves: string }[] = []
+		const history = []
 
 		// Handle arrow keys.
 
@@ -75,7 +62,7 @@ addEventListener('DOMContentLoaded', async () =>
 
 			// Update the move list.
 
-			const pastMovesEl = document.querySelector('.past-moves') as HTMLElement
+			const pastMovesEl = document.querySelector('.past-moves')
 
 			pastMovesEl.innerHTML = oldBoardState.moves
 			pastMovesEl.style.scrollBehavior = 'unset'

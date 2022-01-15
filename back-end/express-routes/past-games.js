@@ -1,10 +1,9 @@
-import { Request, Response } from 'express'
 import { readDatabase } from '../database.js'
 
 /**
  * Route that displays the past games.
  */
-export const pastGamesRoute = async (_req: Request, res: Response) =>
+export const pastGamesRoute = async (_req, res) =>
 {
 	// Read the past games from the database and generate HTML for them.
 	// This HTML will be added to the page using EJS.

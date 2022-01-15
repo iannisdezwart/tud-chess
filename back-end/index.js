@@ -46,7 +46,7 @@ wsServer.on('connection', ws =>
 	{
 		// Parse the message.
 
-		let data: any
+		let data
 
 		try
 		{

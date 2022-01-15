@@ -1,33 +1,18 @@
-interface GameReadyData
-{
-	type: 'game-ready'
-	gameID: string
-}
-
-interface ServerStatsData
-{
-	type: 'server-stats'
-	games: number
-	players: number
-	webSocketConnections: number
-	pastGames: number
-}
-
 // If a game is ready, join it.
 
-receive('game-ready', (data: GameReadyData) =>
+receive('game-ready', data =>
 {
 	location.href = `/play/${ data.gameID }`
 })
 
 // When we get server stats, dipslay them.
 
-receive('server-stats', (data: ServerStatsData) =>
+receive('server-stats', data =>
 {
-	const playerCount = document.querySelector('#stats #player-count') as HTMLElement
-	const gameCount = document.querySelector('#stats #game-count') as HTMLElement
-	const webSocketCount = document.querySelector('#stats #websocket-connection-count') as HTMLElement
-	const pastGamesCount = document.querySelector('#stats #past-games-count') as HTMLElement
+	const playerCount = document.querySelector('#stats #player-count')
+	const gameCount = document.querySelector('#stats #game-count')
+	const webSocketCount = document.querySelector('#stats #websocket-connection-count')
+	const pastGamesCount = document.querySelector('#stats #past-games-count')
 
 	playerCount.innerText = data.players.toString()
 	gameCount.innerText = data.games.toString()
@@ -53,7 +38,7 @@ addEventListener('DOMContentLoaded', () =>
 {
 	// Handle the username input.
 
-	const usernameInput = document.querySelector('#username') as HTMLInputElement
+	const usernameInput = document.querySelector('#username')
 	const username = localStorage.getItem('username')
 
 	if (username == null)

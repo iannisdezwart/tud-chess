@@ -1,18 +1,10 @@
-import WebSocket from 'ws'
 import { games } from '../Game.js'
 import { sendError } from '../util.js'
-
-interface OfferDrawData
-{
-	type: 'offer-draw'
-	gameID: string
-	token: string
-}
 
 /**
  * Offers a draw for a player.
  */
-export const offerDraw = (data: OfferDrawData, ws: WebSocket) =>
+export const offerDraw = (data, ws) =>
 {
 	// Handle missing fields.
 

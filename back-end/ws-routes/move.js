@@ -1,23 +1,12 @@
-import { WebSocket } from 'ws'
 import { games } from '../Game.js'
 import { sendError } from '../util.js'
 
-interface MoveData
-{
-	type: 'move'
-	gameID: string
-	token: string
-	from: Square
-	to: Square
-	promotion: ChessPieceType
-}
-
 /**
  * Handles a client's request to make a move.
- * @param { MoveData } data The client's request.
- * @param { WebSocket } ws The client's WebSocket.
+ * @param data The client's request.
+ * @param ws The client's WebSocket.
  */
-export const move = (data: MoveData, ws: WebSocket) =>
+export const move = (data, ws) =>
 {
 	// Handle missing fields.
 

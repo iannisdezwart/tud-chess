@@ -2,27 +2,10 @@
 
 if (typeof module != 'undefined')
 {
-	// @ts-ignore
 	ChessPiece = require('./ChessPiece.js').ChessPiece
-	// @ts-ignore
 	Colour = require('./ChessPiece.js').Colour
-	// @ts-ignore
 	ChessPieceType = require('./ChessPiece.js').ChessPieceType
-	// @ts-ignore
 	Square = require('./Square.js')
-}
-
-interface SerialisedChessBoard
-{
-	board: string
-	whiteCastleShort: boolean
-	whiteCastleLong: boolean
-	blackCastleShort: boolean
-	blackCastleLong: boolean
-	whiteEnPassant: boolean[]
-	blackEnPassant: boolean[]
-	turn: Colour
-	turnNumber: number
 }
 
 /**
@@ -31,19 +14,28 @@ interface SerialisedChessBoard
  */
 class ChessBoard
 {
-	board: ChessPiece[][]
+	// A two dimensional array of all the squares on the board.
+	// Squares that don't contain pieces are null.
+	board
 
-	whiteCastleShort: boolean
-	whiteCastleLong: boolean
+	// Flags for castling legality.
+	// True means the king can castle in that direction.
+	whiteCastleShort
+	whiteCastleLong
+	blackCastleShort
+	blackCastleLong
 
-	blackCastleShort: boolean
-	blackCastleLong: boolean
+	// Flags for en passant capture legality.
+	// These fields are arrays of size 8, one for each rank.
+	// True means the pawn can capture en passant in that rank.
+	whiteEnPassant
+	blackEnPassant
 
-	whiteEnPassant: boolean[]
-	blackEnPassant: boolean[]
+	// The player whose turn it is to move.
+	turn
 
-	turn: Colour
-	turnNumber: number
+	// The turn number. The first turn is 0.
+	turnNumber
 
 	constructor()
 	{
@@ -93,7 +85,7 @@ class ChessBoard
 	/**
 	 * Serialises the chess board so it can be sent through a WebSocket.
 	 */
-	serialise(): SerialisedChessBoard
+	serialise()
 	{
 		let boardString = ''
 
@@ -141,7 +133,7 @@ class ChessBoard
 	 * Deserialises a chess board serialised using `ChessBoard.serialise()`.
 	 * This allows a chess board to be deserialised from a WebSocket.
 	 */
-	static deserialise(serialisedBoard: SerialisedChessBoard)
+	static deserialise(serialisedBoard)
 	{
 		const board = new ChessBoard()
 
@@ -177,7 +169,7 @@ class ChessBoard
 	/**
 	 * Returns the piece at the given square.
 	 */
-	pieceAt(x: number, y: number)
+	pieceAt(x, y)
 	{
 		return this.board[y][x]
 	}
@@ -185,7 +177,7 @@ class ChessBoard
 	/**
 	 * Sets the piece at the given square.
 	 */
-	setAt(x: number, y: number, piece: ChessPiece)
+	setAt(x, y, piece)
 	{
 		this.board[y][x] = piece
 	}
@@ -193,7 +185,7 @@ class ChessBoard
 	/**
 	 * Decodes a human readable chess coordinate to square indices.
 	 */
-	decodeCoord(coord: string)
+	decodeCoord(coord)
 	{
 		const x = coord.charCodeAt(0) - 'a'.charCodeAt(0)
 		const y = coord.charCodeAt(1) - '1'.charCodeAt(0)
@@ -204,7 +196,7 @@ class ChessBoard
 	/**
 	 * Returns the colour of the given square.
 	 */
-	squareColour(x: number, y: number)
+	squareColour(x, y)
 	{
 		if ((x + y) % 2 == 0)
 		{
@@ -217,7 +209,7 @@ class ChessBoard
 	/**
 	 * Sets a piece at a given human readable chess coordinate.
 	 */
-	set(coord: string, pieceType: ChessPieceType, colour: Colour)
+	set(coord, pieceType, colour)
 	{
 		const [ x, y ] = this.decodeCoord(coord)
 
@@ -492,9 +484,9 @@ class ChessBoard
 	/**
 	 * Returns an array of all possible moves for a given piece.
 	 */
-	possibleMoves(x: number, y: number, checkCheck: boolean)
+	possibleMoves(x, y, checkCheck)
 	{
-		const moves: Square[] = []
+		const moves = []
 
 		if (x >= 8 || y >= 8 || x < 0 || y < 0)
 		{
@@ -1919,7 +1911,7 @@ class ChessBoard
 	 * Pretends to move a piece from one square to another.
 	 * Used for checking if a move is legal.
 	 */
-	pretend(from: Square, to: Square)
+	pretend(from, to)
 	{
 		const oldPiece = this.pieceAt(to.x, to.y)
 		const movedPiece = this.pieceAt(from.x, from.y)
@@ -1933,7 +1925,7 @@ class ChessBoard
 	/**
 	 * Undoes `ChessBoard.pretend()`.
 	 */
-	unpretend(from: Square, to: Square, oldPiece: ChessPiece)
+	unpretend(from, to, oldPiece)
 	{
 		this.setAt(from.x, from.y, this.pieceAt(to.x, to.y))
 		this.setAt(to.x, to.y, oldPiece)
@@ -1942,7 +1934,7 @@ class ChessBoard
 	/**
 	 * Checks if a move is legal.
 	 */
-	isLegal(xFrom: number, yFrom: number, xTo: number, yTo: number)
+	isLegal(xFrom, yFrom, xTo, yTo)
 	{
 		const from = new Square(xFrom, yFrom)
 		const to = new Square(xTo, yTo)
@@ -1969,12 +1961,12 @@ class ChessBoard
 	 * Performs a move on the board.
 	 * Returns the squares that were changed.
 	 */
-	async move(fromSquare: Square, toSquare: Square, promotion: () => Promise<ChessPieceType>)
+	async move(fromSquare, toSquare, promotion)
 	{
 		const { x: xFrom, y: yFrom } = fromSquare
 		const { x: xTo, y: yTo } = toSquare
 
-		const changedSquares: Square[] = []
+		const changedSquares = []
 
 		if (!this.isLegal(xFrom, yFrom, xTo, yTo))
 		{
@@ -2261,5 +2253,3 @@ if (typeof module != 'undefined')
 {
 	module.exports = ChessBoard
 }
-
-type ChessBoardClass = typeof ChessBoard

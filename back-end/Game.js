@@ -1,18 +1,8 @@
 import { WebSocket } from 'ws'
 import { send } from './util.js'
 import { createHash } from 'crypto'
-// @ts-ignore
-import _ChessBoard from '../front-end/js/ChessBoard.js'
+import ChessBoard from '../front-end/js/ChessBoard.js'
 import { addToDatabase } from './database.js'
-const ChessBoard = _ChessBoard as ChessBoardClass
-
-export interface Player
-{
-	ws: WebSocket
-	token: string
-	username: string
-	clock: number
-}
 
 /**
  * Class representing a chess game between two opponents.
@@ -20,44 +10,44 @@ export interface Player
 export class Game
 {
 	// The ID of the game.
-	id: string
+	id
 
 	// The two players.
-	white: Player
-	black: Player
+	white
+	black
 
 	// Flags for offering draws.
-	whiteOffersDraw: boolean
-	blackOffersDraw: boolean
+	whiteOffersDraw
+	blackOffersDraw
 
 	// List of WebSockets that are subscribed to this game.
 	// All moves are broadcast to all subscribers.
-	subscribers: Set<WebSocket>
+	subscribers
 
 	// The chess board.
-	board: ChessBoard
+	board
 
 	// The time of the last move.
-	lastMoveTime: number
+	lastMoveTime
 
 	// An array of all the moves that have occured in this game.
-	moves: Move[]
+	moves
 
 	// A map of hashes of all board positions that have occurred.
 	// The number of times this position has occurred is stored.
 	// This is used to check threefold repetition.
-	history: Map<string, number>
+	history
 
 	// Counter for the 50 move rule.
-	fiftyMoveRule: number
+	fiftyMoveRule
 
 	// Boolean for whether the game is over.
-	ended: boolean
+	ended
 
 	// The start time of the game.
-	startTime: number
+	startTime
 
-	constructor(id: string, player1: Player, player2: Player)
+	constructor(id, player1, player2)
 	{
 		this.id = id
 
@@ -152,7 +142,7 @@ export class Game
 	 * The game will be saved to the database.
 	 * @param winner The colour of the winner. If null, the game is a draw.
 	 */
-	endGame(winner: Colour, reason: string)
+	endGame(winner, reason)
 	{
 		// Broadcast the winner to all subscribers.
 
@@ -178,7 +168,7 @@ export class Game
 	/**
 	 * Saves the game to the database.
 	 */
-	saveToDatabase(winner: Colour)
+	saveToDatabase(winner)
 	{
 		addToDatabase({
 			id: this.id,
@@ -220,11 +210,11 @@ export class Game
 	/**
 	 * Sends the current game state to a given WebSocket.
 	 */
-	sendGameState(ws: WebSocket)
+	sendGameState(ws)
 	{
 		const player = ws == this.black.ws ? Colour.Black : Colour.White
 		const clocks = this.calculateClocks()
-		let drawOffer: Colour
+		let drawOffer
 
 		if (this.whiteOffersDraw)
 		{
@@ -254,10 +244,10 @@ export class Game
 	 * Sends a move to all subscribers, updates the clock for
 	 * the player who made the move, and adds the move to the moves array.
 	 */
-	async sendMove(from: Square, to: Square, promotionCb: () => Promise<ChessPieceType>)
+	async sendMove(from, to, promotionCb)
 	{
 		const movedPiece = this.board.pieceAt(from.x, from.y)
-		let promotion: ChessPieceType
+		let promotion
 
 		// Reset draw offers.
 
@@ -389,7 +379,7 @@ export class Game
 	/**
 	 * Handles draw offers from the players.
 	 */
-	offerDraw(player: Colour)
+	offerDraw(player)
 	{
 		if (player == Colour.White)
 		{
@@ -443,4 +433,4 @@ export class Game
 }
 
 // Map of game IDs to games.
-export const games: Map<string, Game> = new Map()
+export const games = new Map()

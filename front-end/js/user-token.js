@@ -1,8 +1,3 @@
-interface UserTokenData
-{
-	token: string
-}
-
 /**
  * Returns a promise that resolves to the user's token.
  */
@@ -18,7 +13,7 @@ const userToken = () => new Promise(resolve =>
 
 	send({ type: 'get-user-token' })
 
-	receive('user-token', (data: UserTokenData) =>
+	receive('user-token', data =>
 	{
 		sessionStorage.setItem('user-token', data.token)
 		resolve(data.token)

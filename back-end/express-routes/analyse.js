@@ -1,10 +1,9 @@
-import { Request, Response } from 'express'
 import { readDatabase } from '../database.js'
 
 /**
  * Route that analyses a past game.
  */
-export const analyseRoute = async (req: Request, res: Response) =>
+export const analyseRoute = async (req, res) =>
 {
 	// Get the game ID from the URL.
 

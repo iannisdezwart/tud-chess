@@ -4,31 +4,51 @@
  */
 class HTMLChessBoard
 {
-	board: ChessBoard
-	moves: Move[]
+	// The actual raw board, since this is just a wrapper around it.
+	board
 
-	boardEl: HTMLElement
-	boardContainerEl: HTMLElement
+	// Array of the moves that have been made.
+	moves
 
-	player: Colour
+	// The element that contains the board.
+	boardEl
 
-	draggingPiece: boolean
-	clickedPiece: HTMLElement
-	clickedPieceSquare: Square
+	// The element that contains the board container.
+	boardContainerEl
 
+	// The player of the game.
+	// If this is black, the board is rotated 180 degrees.
+	player
+
+	// The element that the user is currently dragging.
+	draggingPiece
+
+	// The last element that was clicked on.
+	clickedPiece
+
+	// The square of the last clicked piece.
+	clickedPieceSquare
+
+	// Makes the board unselectable if true, used for spectating games.
 	unselectable = false
+
+	// Hides certain elements such as the clock if the game is analysed.
 	analysisMode = false
 
-	whiteUsername: string
-	blackUsername: string
+	// Hold the players' usernames.
+	whiteUsername
+	blackUsername
 
-	blackClock: number
-	whiteClock: number
-	latestMoveTime: number
+	// Hold the players' clocks.
+	blackClock
+	whiteClock
+
+	// Holds the time of the latest move.
+	latestMoveTime
 
 	static CLOCK_UPDATE_HANDLER_INTERVAL = 100
 
-	constructor(boardContainerEl: HTMLElement, player: Colour)
+	constructor(boardContainerEl, player)
 	{
 		this.boardContainerEl = boardContainerEl
 		this.board = ChessBoard.generateDefault()
@@ -38,7 +58,7 @@ class HTMLChessBoard
 	/**
 	 * Sets the board from a string.
 	 */
-	setBoard(board: SerialisedChessBoard)
+	setBoard(board)
 	{
 		this.board = ChessBoard.deserialise(board)
 	}
@@ -47,7 +67,7 @@ class HTMLChessBoard
 	 * Wraps a MouseEvent to a Touch, so we can write the same code for
 	 * both mouse and touch events.
 	 */
-	wrapMouseEventToTouch(e: MouseEvent)
+	wrapMouseEventToTouch(e)
 	{
 		const { target, clientX, clientY } = e
 		return new Touch({ identifier: 0, target, clientX, clientY })
@@ -57,7 +77,7 @@ class HTMLChessBoard
 	 * Wraps a TouchEvent to a Touch, so we can write the same code for
 	 * both mouse and touch events.
 	 */
-	wrapTouchEventToTouch(e: TouchEvent)
+	wrapTouchEventToTouch(e)
 	{
 		return e.changedTouches[0]
 	}
@@ -67,7 +87,7 @@ class HTMLChessBoard
 	 * The square is formatted absolutely, so it's always relative to the
 	 * A1 square.
 	 */
-	pointedSquare(touch: Touch)
+	pointedSquare(touch)
 	{
 		const { clientX, clientY } = touch
 		const boardRect = this.boardEl.getBoundingClientRect()
@@ -88,7 +108,7 @@ class HTMLChessBoard
 	 * square HTML element on the board. Takes in account the board's
 	 * rotation.
 	 */
-	translatePointerPositionToSquare(x: number, y: number)
+	translatePointerPositionToSquare(x, y)
 	{
 		if (this.player == Colour.White)
 		{
@@ -104,7 +124,7 @@ class HTMLChessBoard
 	 * Returns the HTML element that corresponds to a square on the
 	 * chess board.
 	 */
-	getSquare(square: Square)
+	getSquare(square)
 	{
 		const { x, y } = square
 		const sq = this.translatePointerPositionToSquare(x, y)
@@ -114,7 +134,7 @@ class HTMLChessBoard
 	/**
 	 * Handles the start of a drag.
 	 */
-	touchDownHandler(touch: Touch, e: Event)
+	touchDownHandler(touch, e)
 	{
 		// If we previously clicked on a piece and we now click on
 		// a legal move square, we will perfome the move.
@@ -143,7 +163,7 @@ class HTMLChessBoard
 
 		// Check if the user is hovering over a piece.
 
-		const target = touch.target as HTMLElement
+		const target = touch.target
 
 		if (!target.classList.contains('piece')
 			|| !target.classList.contains('selectable'))
@@ -176,7 +196,7 @@ class HTMLChessBoard
 	/**
 	 * Handles dragging.
 	 */
-	touchMoveHandler(touch: Touch, e: Event)
+	touchMoveHandler(touch, e)
 	{
 		if (!this.draggingPiece)
 		{
@@ -206,7 +226,7 @@ class HTMLChessBoard
 	/**
 	 * Handles the end of a drag.
 	 */
-	touchUpHandler(touch: Touch, e: Event)
+	touchUpHandler(touch, e)
 	{
 		if (!this.draggingPiece)
 		{
@@ -266,7 +286,7 @@ class HTMLChessBoard
 	/**
 	 * Adds a move to the past moves list.
 	 */
-	addMoveListItem(move: Move)
+	addMoveListItem(move)
 	{
 		const listEl = document.querySelector<HTMLUListElement>('.past-moves')
 		const numMoves = listEl.children.length
@@ -300,11 +320,11 @@ class HTMLChessBoard
 	/**
 	 * Performs a move.
 	 */
-	async performMove(fromSquare: Square, toSquare: Square)
+	async performMove(fromSquare, toSquare)
 	{
 		// Perform the move locally.
 
-		let promotion: ChessPieceType
+		let promotion
 
 		await this.move(fromSquare, toSquare, async () => {
 			promotion = await this.promptPromotion()
@@ -331,7 +351,7 @@ class HTMLChessBoard
 	 * Returns the piece at a square.
 	 * Does not take into account the board's rotation.
 	 */
-	pieceAt(x: number, y: number)
+	pieceAt(x, y)
 	{
 		if (this.player == Colour.White)
 		{
@@ -344,7 +364,7 @@ class HTMLChessBoard
 	/**
 	 * Prompts the user to choose a piece to promote to.
 	 */
-	promptPromotion(): Promise<ChessPieceType>
+	promptPromotion()
 	{
 		const player = this.player
 
@@ -379,7 +399,7 @@ class HTMLChessBoard
 
 		return new Promise(resolve =>
 		{
-			const choose = (choice: ChessPieceType) =>
+			const choose = choice =>
 			{
 				document.querySelector('.promotion').remove()
 				resolve(choice)
@@ -395,24 +415,24 @@ class HTMLChessBoard
 	/**
 	 * Performs a move on the board.
 	 */
-	async move(from: Square, to: Square, promotionCb: () => Promise<ChessPieceType>)
+	async move(from, to, promotionCb)
 	{
 		const movedPiece = this.board.pieceAt(from.x, from.y)
 
 		// Resets any draw offers.
 
-		const gameInfoEl = document.querySelector('.game-info') as HTMLElement
+		const gameInfoEl = document.querySelector('.game-info')
 		gameInfoEl.innerText = ''
 
 		if (!IS_SPECTATOR)
 		{
-			const drawButton = document.querySelector('#offer-draw') as HTMLElement
+			const drawButton = document.querySelector('#offer-draw')
 			drawButton.classList.remove('glow')
 		}
 
 		// Perform the move.
 
-		let promotion: ChessPieceType
+		let promotion
 
 		const changedSquares = await this.board.move(from, to,
 			async () =>
@@ -685,8 +705,8 @@ class HTMLChessBoard
 
 		const statsEl = this.boardContainerEl.querySelector('.stats')
 
-		const topUsernameEl = statsEl.querySelector('.top .username') as HTMLElement
-		const bottomUsernameEl = statsEl.querySelector('.bottom .username') as HTMLElement
+		const topUsernameEl = statsEl.querySelector('.top .username')
+		const bottomUsernameEl = statsEl.querySelector('.bottom .username')
 
 		if (this.player == Colour.White)
 		{
@@ -703,10 +723,10 @@ class HTMLChessBoard
 
 		if (!IS_SPECTATOR)
 		{
-			const buttonsEl = statsEl.querySelector('.buttons') as HTMLElement
+			const buttonsEl = statsEl.querySelector('.buttons')
 
-			const resignEl = buttonsEl.querySelector('#resign') as HTMLElement
-			const offerDrawEl = buttonsEl.querySelector('#offer-draw') as HTMLElement
+			const resignEl = buttonsEl.querySelector('#resign')
+			const offerDrawEl = buttonsEl.querySelector('#offer-draw')
 
 			resignEl.addEventListener('click', async () =>
 			{
@@ -731,7 +751,7 @@ class HTMLChessBoard
 	/**
 	 * Returns a given millisecond clock in a human readable format.
 	 */
-	getClock(clock: number, isTurn: boolean)
+	getClock(clock, isTurn)
 	{
 		// If needed, subtract the elapsed time since the last move.
 
@@ -796,15 +816,15 @@ class HTMLChessBoard
 	 * of both players every 100ms.
 	 * This function is stopped and restarted after every move.
 	 */
-	clockUpdateHandler(currentTurnNumber: number)
+	clockUpdateHandler(currentTurnNumber)
 	{
 		if (this.board.turnNumber != currentTurnNumber)
 		{
 			return
 		}
 
-		let whiteClockEl: HTMLElement
-		let blackClockEl: HTMLElement
+		let whiteClockEl
+		let blackClockEl
 
 		// Get the elements of the clocks.
 
@@ -908,15 +928,15 @@ class HTMLChessBoard
 	/**
 	 * Handles a draw offer.
 	 */
-	handleDrawOffer(player: Colour)
+	handleDrawOffer(player)
 	{
 		const playerColour = player == Colour.White ? 'White' : 'Black'
-		const gameInfoEl = document.querySelector('.game-info') as HTMLElement
+		const gameInfoEl = document.querySelector('.game-info')
 		gameInfoEl.innerText = `${ playerColour } has offered a draw.`
 
 		if (!IS_SPECTATOR)
 		{
-			const drawButton = document.querySelector('#offer-draw') as HTMLElement
+			const drawButton = document.querySelector('#offer-draw')
 			drawButton.classList.add('glow')
 		}
 	}
@@ -924,7 +944,7 @@ class HTMLChessBoard
 	/**
 	 * Handles the end of a game.
 	 */
-	endGame(winner: Colour, reason: string)
+	endGame(winner, reason)
 	{
 		// Stop the clock update handler.
 
@@ -937,7 +957,7 @@ class HTMLChessBoard
 
 		// Show the reason for the end of the game.
 
-		const gameInfoEl = this.boardContainerEl.querySelector('.game-info') as HTMLElement
+		const gameInfoEl = this.boardContainerEl.querySelector('.game-info')
 		gameInfoEl.innerText = reason
 
 		// Flip the opponent's king upside down.
