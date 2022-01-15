@@ -3,7 +3,7 @@ import { send } from './util.js'
 import { createHash } from 'crypto'
 // @ts-ignore
 import _ChessBoard from '../front-end/js/ChessBoard.js'
-import { addToDatabase, numberOfPastGames } from './database.js'
+import { addToDatabase } from './database.js'
 const ChessBoard = _ChessBoard as ChessBoardClass
 
 export interface Player
@@ -188,8 +188,6 @@ export class Game
 			dateTime: this.startTime,
 			winner
 		})
-
-		numberOfPastGames++
 	}
 
 	/**

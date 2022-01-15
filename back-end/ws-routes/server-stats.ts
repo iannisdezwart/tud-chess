@@ -2,7 +2,7 @@ import { WebSocket } from 'ws'
 import { wsServer } from '../index.js'
 import { games } from '../Game.js'
 import { send } from '../util.js'
-import { numberOfPastGames } from '../database.js'
+import { getNumberOfPastGames } from '../database.js'
 
 export const serverStats = async (ws: WebSocket) =>
 {
@@ -11,6 +11,6 @@ export const serverStats = async (ws: WebSocket) =>
 		games: games.size,
 		players: games.size * 2,
 		webSocketConnections: wsServer.clients.size,
-		pastGames: numberOfPastGames
+		pastGames: getNumberOfPastGames()
 	})
 }
