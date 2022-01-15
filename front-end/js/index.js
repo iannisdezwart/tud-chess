@@ -57,5 +57,5 @@ addEventListener('DOMContentLoaded', () =>
 
 	wsModule.send({ type: 'get-server-stats' })
 
-	setInterval(() => send({ type: 'get-server-stats' }), 500)
+	setInterval(() => wsModule.send({ type: 'get-server-stats' }), 500)
 })

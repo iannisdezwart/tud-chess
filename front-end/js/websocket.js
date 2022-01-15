@@ -2,7 +2,7 @@
  * Module containing a `send()` and `receive()` function
  * for WebSocket communication.
  */
-const websocketModule = () =>
+const wsModule = (() =>
 {
 	const scheme = location.protocol == 'https:' ? 'wss' : 'ws'
 	const ws = new WebSocket(`${ scheme }://${ location.host }`)
@@ -59,4 +59,4 @@ const websocketModule = () =>
 	})
 
 	return { send, receive }
-}
+})()

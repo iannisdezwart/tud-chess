@@ -61,7 +61,7 @@ addEventListener('DOMContentLoaded', async () =>
 		board.endGame(data.winner, data.reason)
 	})
 
-	rwsModule.eceive('draw-offer', data =>
+	wsModule.receive('draw-offer', data =>
 	{
 		board.handleDrawOffer(data.player)
 	})
