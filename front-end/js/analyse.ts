@@ -73,9 +73,14 @@ addEventListener('DOMContentLoaded', async () =>
 			leftArrowKey.addEventListener('click', handleLeftArrow)
 			rightArrowKey.addEventListener('click', handleRightArrow)
 
-			// Reload the move list.
+			// Update the move list.
 
-			document.querySelector('.past-moves').innerHTML = oldBoardState.moves
+			const pastMovesEl = document.querySelector('.past-moves') as HTMLElement
+
+			pastMovesEl.innerHTML = oldBoardState.moves
+			pastMovesEl.style.scrollBehavior = 'unset'
+			pastMovesEl.scrollLeft = pastMovesEl.scrollWidth
+			pastMovesEl.style.scrollBehavior = 'smooth'
 		}
 
 		const handleRightArrow = () =>
