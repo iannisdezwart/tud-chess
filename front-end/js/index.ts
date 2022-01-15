@@ -10,6 +10,7 @@ interface ServerStatsData
 	games: number
 	players: number
 	webSocketConnections: number
+	pastGames: number
 }
 
 // If a game is ready, join it.
@@ -26,10 +27,12 @@ receive('server-stats', (data: ServerStatsData) =>
 	const playerCount = document.querySelector('#stats #player-count') as HTMLElement
 	const gameCount = document.querySelector('#stats #game-count') as HTMLElement
 	const webSocketCount = document.querySelector('#stats #websocket-connection-count') as HTMLElement
+	const pastGamesCount = document.querySelector('#stats #past-games-count') as HTMLElement
 
 	playerCount.innerText = data.players.toString()
 	gameCount.innerText = data.games.toString()
 	webSocketCount.innerText = data.webSocketConnections.toString()
+	pastGamesCount.innerText = data.pastGames.toString()
 })
 
 /**

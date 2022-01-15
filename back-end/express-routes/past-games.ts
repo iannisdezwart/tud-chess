@@ -28,6 +28,7 @@ export const pastGamesRoute = async (_req: Request, res: Response) =>
 			</li>
 			`
 		})
+		.reverse()
 		.join('')
 
 	res.render('../views/past-games.ejs', { pastGames })

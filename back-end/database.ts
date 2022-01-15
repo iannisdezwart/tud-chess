@@ -19,6 +19,10 @@ if (!fs.existsSync(DB_FILE))
 	fs.writeFileSync(DB_FILE, '')
 }
 
+// Keep track of the number of past games.
+
+export const numberOfPastGames = fs.readFileSync(DB_FILE, 'utf8').split('\n').length
+
 export const readDatabase = async (
 	filter: (entry: DatabaseEntry) => boolean = () => true) =>
 {

@@ -358,6 +358,7 @@ main
 		padding: 18px 0;
 
 		display: flex;
+		flex-wrap: wrap;
 		justify-content: center;
 
 		background-color: #00bfff;
@@ -405,7 +406,7 @@ main
 	}
 }
 
-@media (max-width: 400px)
+@media (max-width: 500px)
 {
 	#stats li
 	{
