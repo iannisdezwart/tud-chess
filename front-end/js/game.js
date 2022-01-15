@@ -11,7 +11,7 @@ addEventListener('DOMContentLoaded', async () =>
 
 	// Receive the game state.
 
-	receive('game-state', data =>
+	wsModule.receive('game-state', data =>
 	{
 		board = new HTMLChessBoard(boardContainerEl, data.player)
 
@@ -41,7 +41,7 @@ addEventListener('DOMContentLoaded', async () =>
 
 	// Receive the game state updates.
 
-	receive('move', data =>
+	wsModule.receive('move', data =>
 	{
 		if (board.board.turnNumber != data.turnNumber)
 		{
@@ -56,12 +56,12 @@ addEventListener('DOMContentLoaded', async () =>
 		board.update()
 	})
 
-	receive('end', data =>
+	wsModule.receive('end', data =>
 	{
 		board.endGame(data.winner, data.reason)
 	})
 
-	receive('draw-offer', data =>
+	rwsModule.eceive('draw-offer', data =>
 	{
 		board.handleDrawOffer(data.player)
 	})

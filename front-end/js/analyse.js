@@ -7,11 +7,11 @@ addEventListener('DOMContentLoaded', async () =>
 
 	// Analyse the game.
 
-	send({ type: 'analyse-game', gameID })
+	wsModule.send({ type: 'analyse-game', gameID })
 
 	// Receive the game.
 
-	receive('game', data =>
+	wsModule.receive('game', data =>
 	{
 		board = new HTMLChessBoard(boardContainerEl, Colour.White)
 

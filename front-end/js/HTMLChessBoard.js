@@ -337,7 +337,7 @@ class HTMLChessBoard
 
 		// Send the move to the server.
 
-		send({
+		wsModule.send({
 			type: 'move',
 			gameID,
 			token: await userToken(),
@@ -730,7 +730,7 @@ class HTMLChessBoard
 
 			resignEl.addEventListener('click', async () =>
 			{
-				send({
+				wsModule.send({
 					type: 'resign',
 					gameID,
 					token: await userToken()
@@ -739,7 +739,7 @@ class HTMLChessBoard
 
 			offerDrawEl.addEventListener('click', async () =>
 			{
-				send({
+				wsModule.send({
 					type: 'offer-draw',
 					gameID,
 					token: await userToken()

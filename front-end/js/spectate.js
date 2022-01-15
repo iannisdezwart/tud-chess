@@ -4,5 +4,5 @@ addEventListener('DOMContentLoaded', async () =>
 {
 	// Spectate the game.
 
-	send({ type: 'spectate-game', gameID })
+	wsModule.send({ type: 'spectate-game', gameID })
 })

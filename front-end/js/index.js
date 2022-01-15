@@ -1,13 +1,13 @@
 // If a game is ready, join it.
 
-receive('game-ready', data =>
+wsModule.receive('game-ready', data =>
 {
 	location.href = `/play/${ data.gameID }`
 })
 
 // When we get server stats, dipslay them.
 
-receive('server-stats', data =>
+wsModule.receive('server-stats', data =>
 {
 	const playerCount = document.querySelector('#stats #player-count')
 	const gameCount = document.querySelector('#stats #game-count')
@@ -25,7 +25,7 @@ receive('server-stats', data =>
  */
 const joinGame = async () =>
 {
-	send({
+	wsModule.send({
 		type: 'join-game',
 		token: await userToken(),
 		username: localStorage.getItem('username')
@@ -55,7 +55,7 @@ addEventListener('DOMContentLoaded', () =>
 
 	// Fetch server stats.
 
-	send({ type: 'get-server-stats' })
+	wsModule.send({ type: 'get-server-stats' })
 
 	setInterval(() => send({ type: 'get-server-stats' }), 500)
 })
