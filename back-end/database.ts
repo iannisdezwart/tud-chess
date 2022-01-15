@@ -23,8 +23,15 @@ if (!fs.existsSync(DB_FILE))
 
 let numberOfPastGames = fs.readFileSync(DB_FILE, 'utf8').split('\n').length
 
+/**
+ * Returns the number of past games.
+ * Used for retrieving statistics.
+ */
 export const getNumberOfPastGames = () => numberOfPastGames
 
+/**
+ * Reads all the past games from the database where `filter` returns true.
+ */
 export const readDatabase = async (
 	filter: (entry: DatabaseEntry) => boolean = () => true) =>
 {
@@ -50,6 +57,9 @@ export const readDatabase = async (
 	return entries
 }
 
+/**
+ * Writes a new game to the database.
+ */
 export const addToDatabase = (entry: DatabaseEntry) =>
 {
 	fs.appendFileSync(DB_FILE, JSON.stringify(entry) + '\n')

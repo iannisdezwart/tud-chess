@@ -9,6 +9,9 @@ interface ResignData
 	token: string
 }
 
+/**
+ * Resigns a player from a game.
+ */
 export const resign = (data: ResignData, ws: WebSocket) =>
 {
 	// Handle missing fields.

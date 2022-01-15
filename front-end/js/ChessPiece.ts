@@ -28,6 +28,9 @@ class ChessPiece
 		this.colour = colour
 	}
 
+	/**
+	 * Returns a one-letter code for the piece.
+	 */
 	toString()
 	{
 		if (this.colour == Colour.White)
@@ -100,6 +103,9 @@ class ChessPiece
 		}
 	}
 
+	/**
+	 * Reads a one-letter code for the piece.
+	 */
 	static fromString(str: string)
 	{
 		switch (str)
@@ -168,11 +174,18 @@ class ChessPiece
 		return null
 	}
 
+	/**
+	 * Shortcut to check if the piece is a particular piece.
+	 */
 	is(colour: Colour, type: ChessPieceType)
 	{
 		return this.colour == colour && this.type == type
 	}
 
+	/**
+	 * Returns the value of the piece.
+	 * Used for determining the score of a position.
+	 */
 	value()
 	{
 		switch (this.type)
@@ -209,6 +222,10 @@ class ChessPiece
 		}
 	}
 
+	/**
+	 * Returns a string of an HTML image tag containing an SVG
+	 * representation of the piece.
+	 */
 	svg()
 	{
 		if (this.colour == Colour.White)
@@ -305,11 +322,16 @@ class ChessPiece
 		}
 	}
 
+	/**
+	 * Deserialises a piece from a WebSocket.
+	 */
 	static deserialise(chessPiece: ChessPiece)
 	{
 		return new ChessPiece(chessPiece.type, chessPiece.colour)
 	}
 }
+
+// Hack to make this script work with both Node.js and the browser.
 
 if (typeof module != 'undefined')
 {

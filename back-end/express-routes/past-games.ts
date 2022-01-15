@@ -6,6 +6,11 @@ import { readDatabase } from '../database.js'
  */
 export const pastGamesRoute = async (_req: Request, res: Response) =>
 {
+	// Read the past games from the database and generate HTML for them.
+	// This HTML will be added to the page using EJS.
+	// The games will be in descending order of their date.
+	// Newer games will be displayed first.
+
 	const pastGames = (await readDatabase())
 		.map(entry => {
 			const winner = entry.winner == Colour.White

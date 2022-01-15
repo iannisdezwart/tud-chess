@@ -4,6 +4,10 @@ import { games } from '../Game.js'
 import { send } from '../util.js'
 import { getNumberOfPastGames } from '../database.js'
 
+/**
+ * Sends some server statistics to the client.
+ * The client will display them on the home page.
+ */
 export const serverStats = async (ws: WebSocket) =>
 {
 	send(ws, {

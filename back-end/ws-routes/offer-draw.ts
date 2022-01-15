@@ -9,6 +9,9 @@ interface OfferDrawData
 	token: string
 }
 
+/**
+ * Offers a draw for a player.
+ */
 export const offerDraw = (data: OfferDrawData, ws: WebSocket) =>
 {
 	// Handle missing fields.

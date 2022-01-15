@@ -1,3 +1,5 @@
+// Hack to make this script work with both Node.js and the browser.
+
 if (typeof module != 'undefined')
 {
 	// @ts-ignore
@@ -88,6 +90,9 @@ class ChessBoard
 		})
 	}
 
+	/**
+	 * Serialises the chess board so it can be sent through a WebSocket.
+	 */
 	serialise(): SerialisedChessBoard
 	{
 		let boardString = ''
@@ -132,6 +137,10 @@ class ChessBoard
 		}
 	}
 
+	/**
+	 * Deserialises a chess board serialised using `ChessBoard.serialise()`.
+	 * This allows a chess board to be deserialised from a WebSocket.
+	 */
 	static deserialise(serialisedBoard: SerialisedChessBoard)
 	{
 		const board = new ChessBoard()
@@ -165,16 +174,25 @@ class ChessBoard
 		return board
 	}
 
+	/**
+	 * Returns the piece at the given square.
+	 */
 	pieceAt(x: number, y: number)
 	{
 		return this.board[y][x]
 	}
 
+	/**
+	 * Sets the piece at the given square.
+	 */
 	setAt(x: number, y: number, piece: ChessPiece)
 	{
 		this.board[y][x] = piece
 	}
 
+	/**
+	 * Decodes a human readable chess coordinate to square indices.
+	 */
 	decodeCoord(coord: string)
 	{
 		const x = coord.charCodeAt(0) - 'a'.charCodeAt(0)
@@ -183,6 +201,9 @@ class ChessBoard
 		return [ x, y ]
 	}
 
+	/**
+	 * Returns the colour of the given square.
+	 */
 	squareColour(x: number, y: number)
 	{
 		if ((x + y) % 2 == 0)
@@ -193,6 +214,9 @@ class ChessBoard
 		return Colour.White
 	}
 
+	/**
+	 * Sets a piece at a given human readable chess coordinate.
+	 */
 	set(coord: string, pieceType: ChessPieceType, colour: Colour)
 	{
 		const [ x, y ] = this.decodeCoord(coord)
@@ -200,6 +224,11 @@ class ChessBoard
 		this.board[y][x] = new ChessPiece(pieceType, colour)
 	}
 
+	/**
+	 * Counts the number of pieces on the board.
+	 * Useful for checking if a piece has been captured,
+	 * which is used for determining if the fifty move rule applies.
+	 */
 	countPieces()
 	{
 		let count = 0
@@ -218,6 +247,9 @@ class ChessBoard
 		return count
 	}
 
+	/**
+	 * Computes the score of the board.
+	 */
 	computeScore()
 	{
 		let whitePawns = 0
@@ -323,6 +355,9 @@ class ChessBoard
 		}
 	}
 
+	/**
+	 * Returns a boolean indicating whether white is in check.
+	 */
 	whiteInCheck()
 	{
 		for (let y = 0; y < 8; y++)
@@ -352,6 +387,9 @@ class ChessBoard
 		return false
 	}
 
+	/**
+	 * Returns a boolean indicating whether black is in check.
+	 */
 	blackInCheck()
 	{
 		for (let y = 0; y < 8; y++)
@@ -381,6 +419,9 @@ class ChessBoard
 		return false
 	}
 
+	/**
+	 * Returns a boolean indicating whether white can move.
+	 */
 	whiteCanMove()
 	{
 		for (let y = 0; y < 8; y++)
@@ -404,6 +445,9 @@ class ChessBoard
 		return false
 	}
 
+	/**
+	 * Returns a boolean indicating whether black can move.
+	 */
 	blackCanMove()
 	{
 		for (let y = 0; y < 8; y++)
@@ -427,6 +471,9 @@ class ChessBoard
 		return false
 	}
 
+	/**
+	 * Returns a boolean indicating whether the game has ended.
+	 */
 	ended()
 	{
 		if (this.turn == Colour.White && !this.whiteCanMove())
@@ -442,6 +489,9 @@ class ChessBoard
 		return false
 	}
 
+	/**
+	 * Returns an array of all possible moves for a given piece.
+	 */
 	possibleMoves(x: number, y: number, checkCheck: boolean)
 	{
 		const moves: Square[] = []
@@ -1865,6 +1915,10 @@ class ChessBoard
 		return moves
 	}
 
+	/**
+	 * Pretends to move a piece from one square to another.
+	 * Used for checking if a move is legal.
+	 */
 	pretend(from: Square, to: Square)
 	{
 		const oldPiece = this.pieceAt(to.x, to.y)
@@ -1876,12 +1930,18 @@ class ChessBoard
 		return oldPiece
 	}
 
+	/**
+	 * Undoes `ChessBoard.pretend()`.
+	 */
 	unpretend(from: Square, to: Square, oldPiece: ChessPiece)
 	{
 		this.setAt(from.x, from.y, this.pieceAt(to.x, to.y))
 		this.setAt(to.x, to.y, oldPiece)
 	}
 
+	/**
+	 * Checks if a move is legal.
+	 */
 	isLegal(xFrom: number, yFrom: number, xTo: number, yTo: number)
 	{
 		const from = new Square(xFrom, yFrom)
@@ -2130,6 +2190,9 @@ class ChessBoard
 		return changedSquares
 	}
 
+	/**
+	 * Generates an empty chess board.
+	 */
 	static empty()
 	{
 		const board = new ChessBoard()
@@ -2144,6 +2207,9 @@ class ChessBoard
 		return board
 	}
 
+	/**
+	 * Generates a chess board with the standard starting position.
+	 */
 	static generateDefault()
 	{
 		const board = ChessBoard.empty()
@@ -2188,6 +2254,8 @@ class ChessBoard
 		return board
 	}
 }
+
+// Hack to make this script work with both Node.js and the browser.
 
 if (typeof module != 'undefined')
 {
