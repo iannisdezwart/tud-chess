@@ -70,7 +70,7 @@ class HTMLChessBoard
 	wrapMouseEventToTouch(e)
 	{
 		const { target, clientX, clientY } = e
-		return new Touch({ identifier: 0, target, clientX, clientY })
+		return { identifier: 0, target, clientX, clientY }
 	}
 
 	/**
